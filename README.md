@@ -1,162 +1,180 @@
-# MSW Protocol
+<p align="center">
+  <img src="assets/jarvis-hero.png" alt="Jarvis by kr8tiv" width="700" />
+</p>
 
-**Make Shit Work** — An autonomous coding system that bridges NotebookLM and coding agents through an automated conversation engine.
+<h1 align="center">MSW Protocol</h1>
+
+<p align="center">
+  <strong>Make Shit Work</strong> — The autonomous bridge between NotebookLM and your coding agent.
+</p>
+
+<p align="center">
+  <a href="https://x.com/kr8tivai"><img src="https://img.shields.io/badge/kr8tiv-000?style=for-the-badge&logo=x&logoColor=white" alt="kr8tiv" /></a>
+  <a href="https://www.jarvislife.io"><img src="https://img.shields.io/badge/Jarvis_Life_OS-0ff?style=for-the-badge&logo=data:image/svg+xml;base64,&logoColor=black" alt="Jarvis" /></a>
+  <a href="https://github.com/glittercowboy/get-shit-done"><img src="https://img.shields.io/badge/Powered_by_GSD-ff6b6b?style=for-the-badge" alt="GSD" /></a>
+  <img src="https://img.shields.io/badge/license-MIT-green?style=for-the-badge" alt="License" />
+</p>
 
 ---
 
 ## A [kr8tiv](https://x.com/kr8tivai) Project
 
-This protocol is being developed by **kr8tiv** as part of our work building [Jarvis Life OS](https://www.jarvislife.io) — a complex, ambitious project that pushed us to find better ways to work with AI agents.
+<img src="assets/jarvis-bot.png" alt="Jarvis Bot" width="80" align="right" />
 
-While building Jarvis, we discovered that the manual copy-paste loop between NotebookLM and coding agents was tedious but *incredibly effective* at fixing errors. We got tired of being the middleman. MSW automates that workflow.
+Built by **kr8tiv** while shipping [Jarvis Life OS](https://www.jarvislife.io) — a project so complex it forced us to find better ways to work with AI agents.
 
-**This is a side quest born from necessity.** We're sharing it because if it's helping us ship Jarvis faster, it might help you too.
+We discovered the manual copy-paste loop between NotebookLM and coding agents was tedious but *incredibly effective*. We got tired of being the middleman. **MSW automates that workflow.**
 
-### Follow Jarvis Life OS
+> *This is a side quest born from necessity. We're sharing it because if it's helping us ship Jarvis faster, it might help you too.*
 
 | Platform | Link |
 |----------|------|
 | Website | [jarvislife.io](https://www.jarvislife.io) |
 | Twitter/X | [@Jarvis_lifeos](https://x.com/Jarvis_lifeos) |
-
-### Support Our Work
-
-If you find value in what we're building, you can support us by checking out the Jarvis token:
-
-[View on DexScreener](https://dexscreener.com/solana/GNFeekyLr79S7jkBipPznLkiVm1UFqmPNbqS96mXmGqq)
-
----
-
-## Acknowledgements
-
-### GSD Protocol — Thank You
-
-MSW would not exist without the **GSD (Get Shit Done) Protocol** by [@official_taches](https://x.com/official_taches).
-
-When we were struggling to structure our development workflow for Jarvis, GSD gave us the foundation we needed. The spec-driven approach, the phase planning, the verification loops — it changed how we build software with AI agents.
-
-**Thank you for creating GSD. It's genuinely helped us ship faster and with fewer headaches.**
-
-| Resource | Link |
-|----------|------|
-| GitHub | [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done) |
-| Twitter/X | [@official_taches](https://x.com/official_taches) |
+| Token | [View on DexScreener](https://dexscreener.com/solana/GNFeekyLr79S7jkBipPznLkiVm1UFqmPNbqS96mXmGqq) |
 
 ---
 
 ## The Problem
 
-We kept doing the same thing over and over:
+```
+You:     *copies error from Claude Code*
+You:     *pastes into NotebookLM*
+You:     *gets perfect grounded answer*
+You:     *pastes back into Claude Code*
+You:     *agent succeeds*
+You:     *repeats 50 times a day*
+You:     "there has to be a better way"
+```
 
-1. Agent hits an error
-2. Copy the error to NotebookLM
-3. Get a grounded, documentation-backed answer
-4. Paste it back to the agent
-5. Agent succeeds
-6. Repeat 50 times a day
-
-It worked *incredibly well*. We just got tired of being the middleman.
-
-Meanwhile, NotebookLM suggests follow-up questions that most people ignore. Those suggestions are often exactly what you need.
+Meanwhile, NotebookLM suggests follow-up questions that most people ignore. Those suggestions are often *exactly what you need* — and nobody clicks them.
 
 ---
 
 ## The Solution
 
-MSW Protocol creates an **Auto-Conversation Engine** that:
+<p align="center">
+  <img src="assets/kr8tiv-brain.png" alt="kr8tiv Brain" width="280" />
+</p>
 
-- **Auto-expands topics**: Clicks ALL suggested questions in NotebookLM (not just 1-2), evaluates relevance, and keeps going 10+ levels deep
-- **Bidirectional communication**: Injects agent errors INTO NotebookLM, gets grounded answers, feeds them back to the agent
-- **Persistent knowledge**: Compiles everything into markdown and git commits it
-- **No more manual copy-paste**: The whole loop runs automatically
+MSW creates an **Auto-Conversation Engine** that:
+
+- **Auto-expands topics** — Clicks ALL suggested questions in NotebookLM, scores relevance, keeps going 10+ levels deep
+- **Bidirectional comms** — Injects agent errors INTO NotebookLM, gets grounded answers, feeds them back
+- **Persistent knowledge** — Compiles everything into markdown and git commits it
+- **Zero manual intervention** — The whole loop runs autonomously
+
+---
+
+## Architecture
+
+```
+┌──────────────────────────────────────────────────────────────────┐
+│                        MSW MCP SERVER                            │
+│                                                                  │
+│   ┌────────────────────────────────────────────────────────┐    │
+│   │              Auto-Conversation Engine                   │    │
+│   │                                                        │    │
+│   │  1. Detect suggested topics in NotebookLM              │    │
+│   │  2. Score relevance (string-similarity, 0-100)         │    │
+│   │  3. Click high-scoring topics automatically            │    │
+│   │  4. Recurse until convergence (10+ levels)             │    │
+│   │  5. Inject agent errors → get grounded answers         │    │
+│   │  6. Compile & git commit all findings                  │    │
+│   └────────────────────────────────────────────────────────┘    │
+│                                                                  │
+│   ┌──────────────┐   ┌──────────────┐   ┌──────────────┐       │
+│   │  GSD Planner │   │ Ralph Runner │   │Browser Driver│       │
+│   └──────────────┘   └──────────────┘   └──────────────┘       │
+│                                                                  │
+└──────────────────────────────────────────────────────────────────┘
+         │                    │                     │
+         ▼                    ▼                     ▼
+   ┌──────────┐      ┌──────────────┐      ┌──────────────┐
+   │ .msw/    │      │  NotebookLM  │      │   Chrome +   │
+   │ state    │      │  (browser)   │      │  Playwright  │
+   └──────────┘      └──────────────┘      └──────────────┘
+```
 
 ### Built On
 
 | Foundation | Role | Link |
 |------------|------|------|
-| **GSD Protocol** | Spec-driven planning | [GitHub](https://github.com/glittercowboy/get-shit-done) |
-| **Ralph Wiggum Loop** | Continuous iteration | [Anthropic](https://github.com/anthropics/claude-code) |
+| **GSD Protocol** | Spec-driven planning & verification | [GitHub](https://github.com/glittercowboy/get-shit-done) |
+| **Ralph Wiggum Loop** | Continuous iteration until convergence | [Anthropic](https://github.com/anthropics/claude-code) |
 | **NotebookLM MCP** | Agent-to-NotebookLM bridge | [GitHub](https://github.com/PleasePrompto/notebooklm-mcp) |
-
----
-
-## How It Works
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     MSW MCP SERVER                          │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│   Auto-Conversation Engine                                  │
-│   ┌─────────────────────────────────────────────────────┐  │
-│   │ 1. Detect suggested topics in NotebookLM            │  │
-│   │ 2. Score relevance (0-100) with local LLM           │  │
-│   │ 3. Click high-scoring topics automatically          │  │
-│   │ 4. Repeat until no new relevant topics (10+ levels) │  │
-│   │ 5. Inject agent errors, get grounded answers        │  │
-│   │ 6. Compile and git commit all findings              │  │
-│   └─────────────────────────────────────────────────────┘  │
-│                                                             │
-│   ┌───────────────┐  ┌───────────────┐  ┌───────────────┐  │
-│   │ GSD Planner   │  │ Ralph Runner  │  │ Browser Driver│  │
-│   └───────────────┘  └───────────────┘  └───────────────┘  │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-                              │
-                              ▼
-                    ┌─────────────────┐
-                    │   NotebookLM    │
-                    └─────────────────┘
-```
 
 ---
 
 ## Quick Start
 
 ```bash
-# Clone the repo
+# Clone
 git clone https://github.com/Matt-Aurora-Ventures/kr8tiv-MSW.git
 cd kr8tiv-MSW
 
-# Install dependencies
+# Install
 npm install
 
-# Configure your NotebookLM notebook URL
-cp config/default.yaml config/local.yaml
-# Edit config/local.yaml with your notebook URL
+# Build
+npm run build
 
-# Run the MCP server
-node server.js
+# Wire into Claude Code (~/.claude/mcp.json)
+{
+  "mcpServers": {
+    "msw": {
+      "command": "node",
+      "args": ["/path/to/kr8tiv-MSW/dist/mcp/index.js"]
+    }
+  }
+}
 ```
 
-### MCP Tools
+Then restart your IDE. The MSW tools will appear automatically.
 
-| Tool | Description |
+---
+
+## MCP Tools
+
+| Tool | What It Does |
 |------|-------------|
-| `msw_init` | Initialize MSW for a project |
-| `msw_research` | Run auto-conversation to extract NotebookLM knowledge |
-| `msw_plan` | Generate PRD with research grounding |
-| `msw_execute` | Run Ralph loop with NotebookLM feedback |
-| `msw_verify` | Verify completion criteria |
-| `msw_status` | Check progress |
+| `msw_init` | Initialize `.msw/` project directory, run health checks |
+| `msw_notebook_add` | Link a NotebookLM notebook URL to the project |
+| `msw_research` | Auto-conversation engine — extract deep knowledge from NotebookLM |
+| `msw_plan` | Generate PRD grounded in research findings |
+| `msw_execute` | Run Ralph loop with NotebookLM feedback injection |
+| `msw_verify` | Validate implementation against requirements |
+| `msw_status` | Check job progress, project config, health |
 
 ---
 
 ## Documentation
 
+All design documents, research reports, and reference material live in [`docs/`](./docs/):
+
 | Document | Description |
 |----------|-------------|
-| [MSW_PRD.md](./MSW_PRD.md) | Full product requirements |
-| [MSW_PROTOCOL_ARCHITECTURE.md](./MSW_PROTOCOL_ARCHITECTURE.md) | Technical architecture |
-| [Research Report](./Research%20Report_%20Architectural%20Blueprint%20for%20the%20MSW%20Protocol.md) | Architectural blueprint |
+| [MSW_PRD.md](docs/MSW_PRD.md) | Full product requirements |
+| [MSW_PROTOCOL_ARCHITECTURE.md](docs/MSW_PROTOCOL_ARCHITECTURE.md) | Technical architecture |
+| [Architectural Blueprint](docs/architectural-blueprint.md) | Research report on system design |
+| [Guide: Implementing MSW](docs/guide-implementing-msw.md) | Step-by-step implementation guide |
+| [Ralph Loop & MCP](docs/ralph-loop-and-mcp.md) | Advanced agentic orchestration |
+| [Strategic Playbook](docs/strategic-playbook.md) | Go-to-market strategy |
+| [GSD Ralph Prompt](docs/GSD_RALPH_PROMPT.md) | GSD + Ralph integration prompt |
+| [SETUP.md](SETUP.md) | Detailed setup instructions |
 
 ---
 
-## Status
+## Acknowledgements
 
-**Currently in development.** We're building this alongside Jarvis and will release when stable.
+### GSD Protocol
 
-Follow [@kr8tivai](https://x.com/kr8tivai) for updates.
+MSW would not exist without **GSD (Get Shit Done)** by [@official_taches](https://x.com/official_taches). The spec-driven approach, phase planning, and verification loops changed how we build software with AI agents.
+
+| Resource | Link |
+|----------|------|
+| GitHub | [glittercowboy/get-shit-done](https://github.com/glittercowboy/get-shit-done) |
+| Twitter/X | [@official_taches](https://x.com/official_taches) |
 
 ---
 
@@ -168,16 +186,7 @@ No more fuckery. No more endless loops. No more manual copy-paste.
 
 ---
 
-## License
-
-MIT
-
----
-
-## Connect
-
-| | Link |
-|---|------|
-| **kr8tiv** | [@kr8tivai](https://x.com/kr8tivai) |
-| **Jarvis Life OS** | [jarvislife.io](https://www.jarvislife.io) / [@Jarvis_lifeos](https://x.com/Jarvis_lifeos) |
-| **GSD Protocol** | [GitHub](https://github.com/glittercowboy/get-shit-done) / [@official_taches](https://x.com/official_taches) |
+<p align="center">
+  <sub>MIT License</sub><br/>
+  <a href="https://x.com/kr8tivai"><strong>@kr8tivai</strong></a> · <a href="https://www.jarvislife.io"><strong>jarvislife.io</strong></a> · <a href="https://x.com/Jarvis_lifeos"><strong>@Jarvis_lifeos</strong></a>
+</p>
