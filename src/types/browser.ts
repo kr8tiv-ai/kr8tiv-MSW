@@ -34,6 +34,12 @@ export const DEFAULT_BROWSER_CONFIG: BrowserConfig = {
   userAgent: DEFAULT_USER_AGENT,
 };
 
+export interface NotebookConnection {
+  connected: boolean;
+  url: string;
+  title?: string;
+}
+
 function getDefaultProfileDir(): string {
   const home = process.env.HOME || process.env.USERPROFILE || '';
   return `${home}/.msw/chrome-profile`;
