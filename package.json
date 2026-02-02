@@ -9,6 +9,7 @@
   },
   "devDependencies": {
     "@types/node": "^22.19.7",
+    "@types/string-similarity": "^4.0.2",
     "typescript": "^5.9.3"
   },
   "description": "**Make Shit Work** — An autonomous coding system that bridges NotebookLM and coding agents through an automated conversation engine.",
@@ -17,10 +18,13 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "gray-matter": "^4.0.3",
     "ollama": "^0.6.3",
     "playwright": "^1.58.1",
     "playwright-extra": "^4.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
+    "simple-git": "^3.30.0",
+    "string-similarity": "^4.0.4",
     "zod": "^4.3.6"
   }
 }
