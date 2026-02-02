@@ -71,17 +71,15 @@ Plans:
   3. Query deduplication prevents asking the same question twice in a session
   4. NotebookLM answers are injected back into coding agent context with source attribution
   5. All Q&A pairs are compiled to markdown and committed to `.msw/research/` with metadata
-**Plans**: TBD
+**Plans:** 6 plans in 3 waves
 
 Plans:
-- [ ] 03-01: Query injection into NotebookLM chat input
-- [ ] 03-02: Agent error bridge with rich context templates
-- [ ] 03-03: Response extraction with source citation parsing
-- [ ] 03-04: Query deduplication and answer chain compilation
-- [ ] 03-05: Context injection back to coding agent
-- [ ] 03-06: Report compiler with markdown generation
-- [ ] 03-07: Git commit integration with metadata tracking
-- [ ] 03-08: Decision traceability linking
+- [ ] 03-01-PLAN.md — Types + QueryInjector + Deduplication (Wave 1)
+- [ ] 03-02-PLAN.md — Error Bridge + Error Templates (Wave 1)
+- [ ] 03-03-PLAN.md — Response Parser + Answer Chain (Wave 1)
+- [ ] 03-04-PLAN.md — Context Injector + Report Compiler + Metadata (Wave 2)
+- [ ] 03-05-PLAN.md — Git Manager + Traceability (Wave 2)
+- [ ] 03-06-PLAN.md — Barrel exports + build verification (Wave 3)
 
 ### Phase 4: MCP Server
 **Goal**: MCP server exposing all MSW capabilities as tools compatible with Claude Code, Windsurf, and Cursor
@@ -93,17 +91,17 @@ Plans:
   3. `msw_research` tool triggers NotebookLM extraction and returns results or job ID
   4. Long-running operations return job IDs that can be polled for status and results
   5. Server works identically in Claude Code, Windsurf, and Cursor as MCP clients
-**Plans**: TBD
+**Plans:** 8 plans in 4 waves
 
 Plans:
-- [ ] 04-01: MCP server scaffold with stdio transport
-- [ ] 04-02: Tool handler layer foundation
-- [ ] 04-03: msw_init and msw_status tools
-- [ ] 04-04: msw_research tool with engine integration
-- [ ] 04-05: msw_plan and msw_execute tools
-- [ ] 04-06: msw_verify and msw_notebook_add tools
-- [ ] 04-07: Long-running operation polling
-- [ ] 04-08: Multi-client compatibility testing
+- [ ] 04-01-PLAN.md — MCP server scaffold with stdio transport (Wave 1)
+- [ ] 04-02-PLAN.md — Job manager and tool registration infrastructure (Wave 1)
+- [ ] 04-03-PLAN.md — msw_init and msw_status tools (Wave 2)
+- [ ] 04-04-PLAN.md — msw_research tool with job ID pattern (Wave 2)
+- [ ] 04-05-PLAN.md — msw_plan and msw_execute tools (Wave 2)
+- [ ] 04-06-PLAN.md — msw_verify and msw_notebook_add tools (Wave 2)
+- [ ] 04-07-PLAN.md — Wire all tools + end-to-end job flow (Wave 3)
+- [ ] 04-08-PLAN.md — Multi-client compatibility testing (Wave 4)
 
 ### Phase 5: GSD + Ralph Integration
 **Goal**: Research-grounded planning via GSD Protocol and continuous execution via Ralph Loop with NotebookLM feedback on failures
@@ -115,17 +113,17 @@ Plans:
   3. Stop hook prevents premature agent exit and iteration tracking respects max-iterations
   4. Failures trigger automatic NotebookLM queries and inject guidance into next iteration
   5. Behavioral verification validates actual functionality (not just code structure) before marking complete
-**Plans**: TBD
+**Plans:** 8 plans in 4 waves
 
 Plans:
-- [ ] 05-01: GSD state persistence layer
-- [ ] 05-02: Research-grounded PRD generation
-- [ ] 05-03: GSD format adapter (MSW to GSD XML)
-- [ ] 05-04: Ralph stop hook implementation (cross-platform)
-- [ ] 05-05: Iteration tracking and max-iterations enforcement
-- [ ] 05-06: NotebookLM feedback on failures
-- [ ] 05-07: Context injection for next iteration
-- [ ] 05-08: Behavioral verification system
+- [ ] 05-01-PLAN.md — GSD state persistence types + state-manager (Wave 1)
+- [ ] 05-02-PLAN.md — GSD XML format adapter (Wave 1)
+- [ ] 05-03-PLAN.md — Ralph execution types + iteration tracker (Wave 1)
+- [ ] 05-04-PLAN.md — Ralph stop hook script (Wave 2)
+- [ ] 05-05-PLAN.md — Research-grounded PRD generator (Wave 2)
+- [ ] 05-06-PLAN.md — Feedback injector + completion detector (Wave 2)
+- [ ] 05-07-PLAN.md — Ralph runner + behavioral verifier (Wave 3)
+- [ ] 05-08-PLAN.md — Barrel exports + build verification (Wave 4)
 
 ### Phase 6: End-to-End Integration
 **Goal**: Full workflow validation from error detection to resolution, production hardening, and documentation
@@ -136,14 +134,14 @@ Plans:
   2. E2E test suite covers critical paths and runs in CI
   3. Configuration documentation enables new users to set up MSW from scratch
   4. Crash recovery restores state and resumes operation after unexpected termination
-**Plans**: TBD
+**Plans:** 5 plans in 3 waves
 
 Plans:
-- [ ] 06-01: End-to-end pipeline integration
-- [ ] 06-02: E2E test suite development
-- [ ] 06-03: Crash recovery and state restoration
-- [ ] 06-04: Configuration and deployment documentation
-- [ ] 06-05: Performance optimization and hardening
+- [ ] 06-01-PLAN.md — Wire MCP tools to real engine implementations (Wave 1)
+- [ ] 06-02-PLAN.md — Config validation + health checks + crash recovery state (Wave 1)
+- [ ] 06-03-PLAN.md — E2E test infrastructure and MCP smoke tests (Wave 2)
+- [ ] 06-04-PLAN.md — Pipeline orchestrator with crash recovery (Wave 2)
+- [ ] 06-05-PLAN.md — Barrel exports + SETUP.md documentation (Wave 3)
 
 ## Progress
 
@@ -157,8 +155,8 @@ Phases execute in numeric order: 1 -> 2 -> 3 -> 4 -> 5 -> 6
 | 2. Auto-Conversation Engine | 0/6 | Not started | - |
 | 3. Bidirectional Communication | 0/8 | Not started | - |
 | 4. MCP Server | 0/8 | Not started | - |
-| 5. GSD + Ralph Integration | 0/8 | Not started | - |
-| 6. End-to-End Integration | 0/5 | Not started | - |
+| 5. GSD + Ralph Integration | 0/8 | Planned (4 waves) | - |
+| 6. End-to-End Integration | 0/5 | Planned (3 waves) | - |
 
 ---
 *Roadmap created: 2026-02-02*
