@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+// vitest globals enabled - no import needed
 import { createTestClient, type TestClient } from "./helpers/spawn-server.js";
 import { startMockNotebookLM, type MockNotebookLMServer } from "../helpers/mock-notebooklm.js";
 import { VALID_CONFIG, SAMPLE_SOURCES } from "./helpers/test-fixtures.js";

@@ -1,9 +1,9 @@
-import { beforeAll, afterAll } from "vitest";
 import fs from "node:fs";
 import path from "node:path";
 import os from "node:os";
 
 // Global test timeout extension for E2E tests
+// Note: beforeAll/afterAll are available globally via vitest config (globals: true)
 beforeAll(() => {
   // Ensure temp directories are clean
   const staleTests = fs.readdirSync(os.tmpdir()).filter((dir) =>
