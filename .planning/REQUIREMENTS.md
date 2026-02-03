@@ -74,18 +74,18 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Automated Testing
 
-- [ ] **TEST-01**: Unit test infrastructure using Vitest with coverage reporting
-- [ ] **TEST-02**: Auth module tests cover token validation, session persistence, logout detection
-- [ ] **TEST-03**: Backup module tests cover state serialization, restoration, corruption recovery
-- [ ] **TEST-04**: Config module tests cover validation, schema enforcement, defaults handling
-- [ ] **TEST-05**: Degradation module tests cover offline mode, cache behavior, recovery
-- [ ] **TEST-06**: Integration tests for authentication flow (login, persist, restore)
-- [ ] **TEST-07**: Integration tests for backup-restore flow (save, corrupt, recover)
-- [ ] **TEST-08**: E2E test for full NotebookLM upload workflow (init, query, extract, commit)
-- [ ] **TEST-09**: E2E test for error-to-resolution pipeline (error detection, NotebookLM query, fix injection)
-- [ ] **TEST-10**: Test coverage reporting with 80%+ critical path coverage target
-- [ ] **TEST-11**: Snapshot testing for response parsing and markdown compilation
-- [ ] **TEST-12**: Mock NotebookLM UI for deterministic selector testing
+- [x] **TEST-01**: Unit test infrastructure using Vitest with coverage reporting
+- [x] **TEST-02**: Auth module tests cover token validation, session persistence, logout detection
+- [x] **TEST-03**: Backup module tests cover state serialization, restoration, corruption recovery
+- [x] **TEST-04**: Config module tests cover validation, schema enforcement, defaults handling
+- [x] **TEST-05**: Degradation module tests cover offline mode, cache behavior, recovery
+- [x] **TEST-06**: Integration tests for authentication flow (login, persist, restore)
+- [x] **TEST-07**: Integration tests for backup-restore flow (save, corrupt, recover)
+- [x] **TEST-08**: E2E test for full NotebookLM upload workflow (init, query, extract, commit)
+- [x] **TEST-09**: E2E test for error-to-resolution pipeline (error detection, NotebookLM query, fix injection)
+- [x] **TEST-10**: Test coverage reporting with 80%+ critical path coverage target
+- [x] **TEST-11**: Snapshot testing for response parsing and markdown compilation
+- [x] **TEST-12**: Mock NotebookLM UI for deterministic selector testing
 
 ### CI/CD Pipeline
 
