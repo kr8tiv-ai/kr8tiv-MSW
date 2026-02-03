@@ -1,0 +1,92 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`parseCitations snapshots > deduplicates repeated citations 1`] = `
+[
+  "[1]",
+  "[auth]",
+]
+`;
+
+exports[`parseCitations snapshots > extracts citations from real NotebookLM-style responses 1`] = `
+[
+  "[1]",
+  "[2]",
+  "[3]",
+  "[Source: Browser Module]",
+  "[Source: MCP Integration]",
+  "[the architecture docs, testing is done at three levels: unit]",
+  "[testing]",
+]
+`;
+
+exports[`parseCitations snapshots > handles empty input 1`] = `[]`;
+
+exports[`parseCitations snapshots > handles malformed citations gracefully 1`] = `
+[
+  "[source
+      Multiple opens [[nested]",
+]
+`;
+
+exports[`parseCitations snapshots > handles response with code blocks and preserves citations 1`] = `
+[
+  "[1]",
+  "[config]",
+]
+`;
+
+exports[`parseCitations snapshots > handles response with lists and multiple citations 1`] = `
+[
+  "[1]",
+  "[2]",
+  "[3]",
+  "[Source: features.md]",
+  "[Source: roadmap.md]",
+  "[the roadmap, testing is complete [Source: roadmap]",
+]
+`;
+
+exports[`parseCitations snapshots > handles response with no citations 1`] = `[]`;
+
+exports[`parseCitations snapshots > handles unicode and special characters in citations 1`] = `
+[
+  "[Source: config-café.md]",
+  "[Source: metrics™.md]",
+  "[文档]",
+]
+`;
+
+exports[`parseCitations snapshots > parses complex response with mixed citation formats 1`] = `
+[
+  "[1]",
+  "[2]",
+  "[12]",
+  "[Testing Guide]",
+  "[Source: browser.md]",
+  "[the architecture docs, it uses three-tier testing [Testing G]",
+  "[config]",
+]
+`;
+
+exports[`parseCitations snapshots > parses response with 'according to' phrases 1`] = `
+[
+  "[the documentation, the system uses persistent Chrome profile]",
+  "[auth]",
+  "[browser]",
+]
+`;
+
+exports[`parseCitations snapshots > parses response with named source citations 1`] = `
+[
+  "[Source: overview.md]",
+  "[Source: browser.md]",
+  "[Source: auto-conversation.md]",
+]
+`;
+
+exports[`parseCitations snapshots > parses simple response with numeric citations 1`] = `
+[
+  "[1]",
+  "[2]",
+]
+`;
