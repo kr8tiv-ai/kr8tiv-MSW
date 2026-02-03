@@ -8,6 +8,7 @@ import {
   registerMswExecute,
   registerMswVerify,
   registerMswNotebookAdd,
+  registerMswUploadSources,
 } from "./tools/index.js";
 
 const VERSION = "0.1.0";
@@ -26,6 +27,7 @@ export function createServer(): McpServer {
     registerMswExecute,
     registerMswVerify,
     registerMswNotebookAdd,
+    registerMswUploadSources,
   ]);
 
   return server;

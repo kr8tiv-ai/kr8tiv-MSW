@@ -255,4 +255,136 @@ export class ConfigManager {
   configExists(): boolean {
     return fs.existsSync(this.configPath);
   }
+
+  /**
+   * Detect config drift by comparing with snapshot
+   */
+  detectDrift(): { hasDrift: boolean; changes: string[]; snapshot?: MswConfig } {
+    const snapshotPath = this.configPath + '.snapshot';
+
+    if (!fs.existsSync(snapshotPath)) {
+      return {
+        hasDrift: false,
+        changes: ['No snapshot available - create one with createSnapshot()'],
+      };
+    }
+
+    try {
+      const current = this.loadConfig().config;
+      const snapshot = JSON.parse(fs.readFileSync(snapshotPath, 'utf-8')) as MswConfig;
+
+      const changes = this.compareConfigs(snapshot, current);
+
+      return {
+        hasDrift: changes.length > 0,
+        changes,
+        snapshot,
+      };
+    } catch (err) {
+      return {
+        hasDrift: false,
+        changes: [`Failed to detect drift: ${err instanceof Error ? err.message : String(err)}`],
+      };
+    }
+  }
+
+  /**
+   * Create a config snapshot for drift detection
+   */
+  createSnapshot(): void {
+    const snapshotPath = this.configPath + '.snapshot';
+    const { config } = this.loadConfig();
+
+    fs.writeFileSync(snapshotPath, JSON.stringify(config, null, 2));
+    console.log('[config] Created config snapshot');
+  }
+
+  /**
+   * Compare two configs and return list of changes
+   */
+  private compareConfigs(baseline: MswConfig, current: MswConfig): string[] {
+    const changes: string[] = [];
+
+    // Check top-level fields
+    for (const key of Object.keys(baseline) as Array<keyof MswConfig>) {
+      const baselineValue = baseline[key];
+      const currentValue = current[key];
+
+      if (typeof baselineValue === 'object' && typeof currentValue === 'object') {
+        // Deep comparison for nested objects
+        const nestedChanges = this.compareObjects(
+          baselineValue as Record<string, unknown>,
+          currentValue as Record<string, unknown>,
+          key,
+        );
+        changes.push(...nestedChanges);
+      } else if (baselineValue !== currentValue) {
+        changes.push(`${key}: ${baselineValue} → ${currentValue}`);
+      }
+    }
+
+    // Check for added fields
+    for (const key of Object.keys(current) as Array<keyof MswConfig>) {
+      if (!(key in baseline)) {
+        changes.push(`Added field: ${key}`);
+      }
+    }
+
+    return changes;
+  }
+
+  /**
+   * Deep compare nested objects
+   */
+  private compareObjects(
+    baseline: Record<string, unknown>,
+    current: Record<string, unknown>,
+    prefix: string,
+  ): string[] {
+    const changes: string[] = [];
+
+    for (const key of Object.keys(baseline)) {
+      const baselineValue = baseline[key];
+      const currentValue = current[key];
+
+      if (baselineValue !== currentValue) {
+        changes.push(`${prefix}.${key}: ${baselineValue} → ${currentValue}`);
+      }
+    }
+
+    for (const key of Object.keys(current)) {
+      if (!(key in baseline)) {
+        changes.push(`Added field: ${prefix}.${key}`);
+      }
+    }
+
+    return changes;
+  }
+
+  /**
+   * Reset config to snapshot
+   */
+  resetToSnapshot(): { success: boolean; error?: string } {
+    const snapshotPath = this.configPath + '.snapshot';
+
+    if (!fs.existsSync(snapshotPath)) {
+      return {
+        success: false,
+        error: 'No snapshot available',
+      };
+    }
+
+    try {
+      const snapshot = fs.readFileSync(snapshotPath, 'utf-8');
+      fs.writeFileSync(this.configPath, snapshot);
+      console.log('[config] Reset to snapshot');
+
+      return { success: true };
+    } catch (err) {
+      return {
+        success: false,
+        error: err instanceof Error ? err.message : String(err),
+      };
+    }
+  }
 }

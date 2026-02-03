@@ -8,3 +8,4 @@ export { registerMswPlan } from "./msw-plan.js";
 export { registerMswExecute } from "./msw-execute.js";
 export { registerMswVerify } from "./msw-verify.js";
 export { registerMswNotebookAdd } from "./msw-notebook-add.js";
+export { registerMswUploadSources } from "./msw-upload-sources.js";
