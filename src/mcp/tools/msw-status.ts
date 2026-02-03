@@ -3,11 +3,12 @@ import path from "node:path";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { jobManager } from "../jobs/job-manager.js";
+import { HealthChecker } from "../../health/index.js";
 
 export function registerMswStatus(server: McpServer): void {
   server.tool(
     "msw_status",
-    "Check MSW status and poll long-running jobs",
+    "Check MSW status, run health checks (msw doctor), and poll jobs",
     {
       jobId: z
         .string()
@@ -17,9 +18,31 @@ export function registerMswStatus(server: McpServer): void {
         .string()
         .optional()
         .describe("Project directory to check .msw/ state"),
+      runHealthCheck: z
+        .boolean()
+        .optional()
+        .default(false)
+        .describe("Run full health check (msw doctor)"),
     },
-    async ({ jobId, projectDir }) => {
+    async ({ jobId, projectDir, runHealthCheck }) => {
       try {
+        // Health check (msw doctor)
+        if (runHealthCheck) {
+          console.log("[msw] Running health check...");
+          const checker = new HealthChecker();
+          const report = await checker.runAll();
+
+          return {
+            content: [
+              {
+                type: "text" as const,
+                text: JSON.stringify(report, null, 2),
+              },
+            ],
+            isError: report.overall === 'critical',
+          };
+        }
+
         if (jobId) {
           const job = jobManager.get(jobId);
           if (!job) {

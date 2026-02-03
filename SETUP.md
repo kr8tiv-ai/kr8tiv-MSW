@@ -215,15 +215,33 @@ Expected output:
 
 ### 3. Test Health Check
 
+Run the `msw doctor` command:
 ```
-Check MSW status
+Run msw_status with runHealthCheck=true
 ```
 
-Expected output shows:
-- MCP server running
-- Chrome profile path
-- Authentication status
-- Linked notebooks
+Or in Claude Code:
+```
+Check MSW health
+```
+
+Expected output:
+```json
+{
+  "overall": "healthy",
+  "summary": "All checks passed. MSW is ready to use.",
+  "checks": [
+    {"name": "node_version", "status": "pass", "message": "Node.js v18.x.x"},
+    {"name": "mcp_config", "status": "pass", "message": "MCP config valid"},
+    {"name": "dist_build", "status": "pass", "message": "Build up to date"},
+    {"name": "authentication", "status": "pass", "message": "Authenticated"},
+    {"name": "playwright", "status": "pass", "message": "Playwright ready"},
+    {"name": "network", "status": "pass", "message": "Network connectivity OK"}
+  ]
+}
+```
+
+If any checks fail, follow the `fix` suggestions provided.
 
 ---
 

@@ -142,13 +142,15 @@ See [SETUP.md](./SETUP.md) for detailed installation and authentication instruct
 
 | Tool | What It Does |
 |------|-------------|
-| `msw_init` | Initialize `.msw/` project directory, run health checks |
+| `msw_init` | Initialize `.msw/` with **Google authentication** and config |
+| `msw_status` | Check job progress, config, or run **health check** (`msw doctor`) |
 | `msw_notebook_add` | Link a NotebookLM notebook URL to the project |
 | `msw_research` | Auto-conversation engine — extract deep knowledge from NotebookLM |
 | `msw_plan` | Generate PRD grounded in research findings |
 | `msw_execute` | Run Ralph loop with NotebookLM feedback injection |
 | `msw_verify` | Validate implementation against requirements |
-| `msw_status` | Check job progress, project config, health |
+
+**New**: `msw_init` now handles authentication automatically. Run `msw_status` with `runHealthCheck: true` for diagnostics.
 
 ---
 
