@@ -2,6 +2,7 @@ import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import {
   registerTools,
   registerMswInit,
+  registerMswDiscover,
   registerMswStatus,
   registerMswResearch,
   registerMswPlan,
@@ -21,6 +22,7 @@ export function createServer(): McpServer {
 
   registerTools(server, [
     registerMswInit,
+    registerMswDiscover,
     registerMswStatus,
     registerMswResearch,
     registerMswPlan,
