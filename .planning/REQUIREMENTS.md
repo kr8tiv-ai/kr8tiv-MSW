@@ -89,16 +89,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### CI/CD Pipeline
 
-- [ ] **CI-01**: GitHub Actions workflow runs tests on every commit
-- [ ] **CI-02**: Multi-Node version testing matrix (Node 18, 20, 22)
-- [ ] **CI-03**: TypeScript type checking in CI pipeline
-- [ ] **CI-04**: Linting enforcement (ESLint + Prettier) on every PR
-- [ ] **CI-05**: Build verification ensures distribution artifacts are valid
-- [ ] **CI-06**: E2E health check runs against live NotebookLM sandbox account
-- [ ] **CI-07**: Automated validation rejects PRs that break critical tests
-- [ ] **CI-08**: Coverage regression detection (fail if coverage drops below threshold)
-- [ ] **CI-09**: Security scanning for dependency vulnerabilities
-- [ ] **CI-10**: Automated release tagging and changelog generation
+- [x] **CI-01**: GitHub Actions workflow runs tests on every commit
+- [x] **CI-02**: Multi-Node version testing matrix (Node 18, 20, 22)
+- [x] **CI-03**: TypeScript type checking in CI pipeline
+- [x] **CI-04**: Linting enforcement (ESLint + Prettier) on every PR
+- [x] **CI-05**: Build verification ensures distribution artifacts are valid
+- [x] **CI-06**: E2E health check runs against live NotebookLM sandbox account
+- [x] **CI-07**: Automated validation rejects PRs that break critical tests
+- [x] **CI-08**: Coverage regression detection (fail if coverage drops below threshold)
+- [x] **CI-09**: Security scanning for dependency vulnerabilities
+- [x] **CI-10**: Automated release tagging and changelog generation
 
 ### Production Hardening
 
