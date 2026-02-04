@@ -93,21 +93,55 @@ export async function scoreRelevance(
   const status = await checkProviders();
 
   if (status.preferred === 'ollama') {
-    // Use Ollama via RelevanceScorer class
+    // Use Ollama directly for LLM-based scoring
     try {
-      const { RelevanceScorer } = await import(
-        '../auto-conversation/relevance-scorer.js'
-      );
-      const scorer = new RelevanceScorer({ model: 'qwen2.5:1.5b', threshold: 30 });
-      const result = await scorer.score(candidateTopic, taskGoal, currentError, previousTopics);
-      return {
-        taskRelevance: Math.round(result.score * 0.4),
-        errorRelevance: currentError ? Math.round(result.score * 0.3) : 0,
-        implementationValue: Math.round(result.score * 0.2),
-        novelty: Math.round(result.score * 0.1),
-        total: result.score,
-        reasoning: result.reasoning,
+      const ollama = await import('ollama');
+      const prompt = `You are a relevance scorer. Score this NotebookLM suggested topic for relevance.
+
+Task goal: ${taskGoal}
+${currentError ? `Current error: ${currentError}` : ''}
+Previously explored topics: ${previousTopics.slice(0, 10).join(', ') || 'none'}
+
+Candidate topic: "${candidateTopic}"
+
+Score each dimension (be strict, most topics should score LOW):
+- taskRelevance (0-40): How directly relevant to the task goal?
+- errorRelevance (0-30): How likely to help resolve the current error? (0 if no error)
+- implementationValue (0-20): How likely to provide concrete implementation details?
+- novelty (0-10): How different from previously explored topics?
+
+Return ONLY valid JSON in this exact format (no markdown, no explanation):
+{"taskRelevance":0,"errorRelevance":0,"implementationValue":0,"novelty":0,"total":0,"reasoning":"one sentence"}`;
+
+      logger.info({ candidateTopic }, 'Scoring relevance with Ollama');
+
+      const response = await ollama.default.chat({
+        model: 'qwen2.5:1.5b',
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      // Parse JSON response
+      const jsonMatch = response.message.content.match(/\{[\s\S]*?\}/);
+      if (!jsonMatch) {
+        throw new Error('No JSON found in Ollama response');
+      }
+
+      const parsed = JSON.parse(jsonMatch[0]) as RelevanceScore;
+
+      // Validate and clamp values
+      const score: RelevanceScore = {
+        taskRelevance: Math.min(40, Math.max(0, parsed.taskRelevance || 0)),
+        errorRelevance: Math.min(30, Math.max(0, parsed.errorRelevance || 0)),
+        implementationValue: Math.min(20, Math.max(0, parsed.implementationValue || 0)),
+        novelty: Math.min(10, Math.max(0, parsed.novelty || 0)),
+        total: 0,
+        reasoning: parsed.reasoning || 'No reasoning provided',
       };
+
+      score.total = score.taskRelevance + score.errorRelevance + score.implementationValue + score.novelty;
+
+      logger.info({ candidateTopic, score: score.total }, 'Ollama relevance score');
+      return score;
     } catch (err) {
       logger.warn({ error: err }, 'Ollama scoring failed, trying Gemini');
       // Fall through to Gemini
@@ -123,16 +157,31 @@ export async function scoreRelevance(
     );
   }
 
-  // No providers available
-  logger.error('No LLM providers available for relevance scoring');
-  return {
-    taskRelevance: 0,
-    errorRelevance: 0,
-    implementationValue: 0,
-    novelty: 0,
-    total: 0,
-    reasoning: 'No LLM providers available',
-  };
+  // No providers available - use fast string-similarity fallback
+  logger.info('No LLM providers available, using string-similarity fallback');
+  try {
+    const { RelevanceScorer } = await import('../auto-conversation/relevance-scorer.js');
+    const scorer = new RelevanceScorer();
+    const result = await scorer.score(candidateTopic, taskGoal, currentError, previousTopics);
+    return {
+      taskRelevance: result.dimensions?.taskRelevance ?? 0,
+      errorRelevance: result.dimensions?.errorRelevance ?? 0,
+      implementationValue: result.dimensions?.implementationValue ?? 0,
+      novelty: result.dimensions?.novelty ?? 0,
+      total: result.score,
+      reasoning: result.reasoning + ' (string-similarity fallback)',
+    };
+  } catch {
+    logger.error('All relevance scoring methods failed');
+    return {
+      taskRelevance: 0,
+      errorRelevance: 0,
+      implementationValue: 0,
+      novelty: 0,
+      total: 0,
+      reasoning: 'All scoring methods failed',
+    };
+  }
 }
 
 /**
