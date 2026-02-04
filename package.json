@@ -54,6 +54,7 @@
     "figlet": "^1.10.0",
     "gray-matter": "^4.0.3",
     "inquirer": "^9.3.8",
+    "ollama": "^0.6.3",
     "ora": "^8.2.0",
     "pino": "^10.3.0",
     "pino-roll": "^4.0.0",

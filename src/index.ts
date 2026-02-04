@@ -67,3 +67,6 @@ export * from './metrics/index.js';
 
 // Session management
 export * from './session/index.js';
+
+// LLM providers (Ollama + Gemini CLI)
+export * from './llm/index.js';
