@@ -142,20 +142,28 @@ describe('LLM Router', () => {
   });
 
   describe('scoreRelevance', () => {
-    it('uses Ollama when available', async () => {
+    it('uses Ollama directly when available', async () => {
       mockFetch.mockResolvedValueOnce({ ok: true });
       mockIsGeminiAvailable.mockResolvedValueOnce(false);
-      mockRelevanceScorerScore.mockResolvedValueOnce({
-        score: 75,
-        reasoning: 'Test reasoning',
+      mockOllamaChat.mockResolvedValueOnce({
+        message: {
+          content: JSON.stringify({
+            taskRelevance: 30,
+            errorRelevance: 20,
+            implementationValue: 15,
+            novelty: 8,
+            total: 73,
+            reasoning: 'Ollama LLM scored',
+          }),
+        },
       });
 
       const result = await scoreRelevance('topic', 'goal', 'error', ['prev']);
 
-      // Should have used RelevanceScorer (Ollama-based)
-      expect(result.total).toBe(75);
-      expect(result.reasoning).toBe('Test reasoning');
-      expect(mockRelevanceScorerScore).toHaveBeenCalled();
+      // Should have used Ollama directly
+      expect(mockOllamaChat).toHaveBeenCalled();
+      expect(result.total).toBe(73);
+      expect(result.reasoning).toBe('Ollama LLM scored');
     });
 
     it('falls back to Gemini when Ollama unavailable', async () => {
@@ -177,14 +185,26 @@ describe('LLM Router', () => {
       expect(result.reasoning).toBe('Gemini scored');
     });
 
-    it('returns zero score when no providers available', async () => {
+    it('falls back to string-similarity when no LLM providers available', async () => {
       mockFetch.mockRejectedValueOnce(new Error('Connection refused'));
       mockIsGeminiAvailable.mockResolvedValueOnce(false);
+      mockRelevanceScorerScore.mockResolvedValueOnce({
+        score: 25,
+        reasoning: 'String similarity match',
+        dimensions: {
+          taskRelevance: 10,
+          errorRelevance: 5,
+          implementationValue: 5,
+          novelty: 5,
+        },
+      });
 
       const result = await scoreRelevance('topic', 'goal', null, []);
 
-      expect(result.total).toBe(0);
-      expect(result.reasoning).toContain('No LLM providers');
+      // Falls back to string-similarity
+      expect(mockRelevanceScorerScore).toHaveBeenCalled();
+      expect(result.total).toBe(25);
+      expect(result.reasoning).toContain('string-similarity fallback');
     });
   });
 
