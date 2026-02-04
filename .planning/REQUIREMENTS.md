@@ -28,20 +28,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Bidirectional Communication
 
-- [ ] **BIDR-01**: Query injection types questions into NotebookLM chat input
-- [ ] **BIDR-02**: Agent error bridge captures coding agent errors and formats for NotebookLM
-- [ ] **BIDR-03**: Response extraction parses NotebookLM answers with source citations
-- [ ] **BIDR-04**: Answer chain compilation aggregates multi-turn conversations
-- [ ] **BIDR-05**: Query deduplication prevents repeating identical questions
-- [ ] **BIDR-06**: Rich error templates structure error context for effective queries
-- [ ] **BIDR-07**: Context injection passes NotebookLM answers back to coding agent
+- [x] **BIDR-01**: Query injection types questions into NotebookLM chat input
+- [x] **BIDR-02**: Agent error bridge captures coding agent errors and formats for NotebookLM
+- [x] **BIDR-03**: Response extraction parses NotebookLM answers with source citations
+- [x] **BIDR-04**: Answer chain compilation aggregates multi-turn conversations
+- [x] **BIDR-05**: Query deduplication prevents repeating identical questions
+- [x] **BIDR-06**: Rich error templates structure error context for effective queries
+- [x] **BIDR-07**: Context injection passes NotebookLM answers back to coding agent
 
 ### Knowledge Persistence
 
-- [ ] **KNOW-01**: Report compiler converts Q&A pairs to structured markdown
-- [ ] **KNOW-02**: Git commit research artifacts to `.msw/research/` directory
-- [ ] **KNOW-03**: Metadata tracking records source notebook, timestamp, relevance scores
-- [ ] **KNOW-04**: Decision traceability links code changes to research findings
+- [x] **KNOW-01**: Report compiler converts Q&A pairs to structured markdown
+- [x] **KNOW-02**: Git commit research artifacts to `.msw/research/` directory
+- [x] **KNOW-03**: Metadata tracking records source notebook, timestamp, relevance scores
+- [x] **KNOW-04**: Decision traceability links code changes to research findings
 
 ### MCP Server
 
@@ -166,17 +166,17 @@ Which phases cover which requirements. Updated during roadmap creation.
 | AUTO-05 | Phase 2 | Complete |
 | AUTO-06 | Phase 2 | Complete |
 | AUTO-07 | Phase 2 | Complete |
-| BIDR-01 | Phase 3 | Pending |
-| BIDR-02 | Phase 3 | Pending |
-| BIDR-03 | Phase 3 | Pending |
-| BIDR-04 | Phase 3 | Pending |
-| BIDR-05 | Phase 3 | Pending |
-| BIDR-06 | Phase 3 | Pending |
-| BIDR-07 | Phase 3 | Pending |
-| KNOW-01 | Phase 3 | Pending |
-| KNOW-02 | Phase 3 | Pending |
-| KNOW-03 | Phase 3 | Pending |
-| KNOW-04 | Phase 3 | Pending |
+| BIDR-01 | Phase 3 | Complete |
+| BIDR-02 | Phase 3 | Complete |
+| BIDR-03 | Phase 3 | Complete |
+| BIDR-04 | Phase 3 | Complete |
+| BIDR-05 | Phase 3 | Complete |
+| BIDR-06 | Phase 3 | Complete |
+| BIDR-07 | Phase 3 | Complete |
+| KNOW-01 | Phase 3 | Complete |
+| KNOW-02 | Phase 3 | Complete |
+| KNOW-03 | Phase 3 | Complete |
+| KNOW-04 | Phase 3 | Complete |
 | MCP-01 | Phase 4 | Pending |
 | MCP-02 | Phase 4 | Pending |
 | MCP-03 | Phase 4 | Pending |
