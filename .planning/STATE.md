@@ -73,6 +73,10 @@ Recent decisions affecting current work:
 - [07-06]: Custom coverage validation script enforces 80%+ on critical paths vs global Vitest thresholds
 - [07-06]: Multi-Node CI matrix (18, 20, 22) ensures compatibility across LTS and current versions
 - [07-06]: json-summary reporter added to vitest for coverage validation script integration
+- [08-01]: vitest-coverage-report-action replaces lcov-reporter for native Vitest support with regression detection
+- [08-01]: E2E health checks run nightly at 2 AM UTC to avoid blocking PRs
+- [08-01]: Auto-create GitHub issue on E2E failure for immediate visibility
+- [08-01]: Composite actions pattern for reusable workflow components
 - [08-02]: check-dist pattern validates dist/ is up-to-date with source on every PR
 - [08-02]: Upload expected-dist artifact on failure enables debugging without local reproduction
 
