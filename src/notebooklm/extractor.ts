@@ -8,6 +8,11 @@
 import type { Page } from 'playwright';
 import { Selectors } from '../browser/selectors.js';
 import { waitForStreamingComplete } from '../browser/wait.js';
+import { createLogger } from '../logging/index.js';
+import { getMetricsCollector } from '../metrics/index.js';
+
+const logger = createLogger('response-extractor');
+const metrics = getMetricsCollector();
 
 /**
  * Extracts responses from the NotebookLM chat interface.
@@ -29,29 +34,34 @@ export class ResponseExtractor {
    * if no response containers are visible.
    */
   async extractLatestResponse(): Promise<string> {
-    const container = Selectors.responseContainer(this.page);
+    return metrics.measureAsync('notebooklm.response', async () => {
+      logger.debug('Extracting latest response');
+      const container = Selectors.responseContainer(this.page);
 
-    const count = await container.count();
-    if (count === 0) {
-      return '';
-    }
+      const count = await container.count();
+      if (count === 0) {
+        logger.debug('No response containers found');
+        return '';
+      }
 
-    const last = container.last();
+      const last = container.last();
 
-    try {
-      await waitForStreamingComplete(
-        this.page,
-        '[data-message-author="assistant"]:last-of-type',
-      );
-    } catch {
-      // Timeout: extract whatever content exists
-      console.warn(
-        '[extractor] Streaming detection timed out, extracting available content',
-      );
-    }
+      try {
+        logger.debug('Waiting for streaming to complete');
+        await waitForStreamingComplete(
+          this.page,
+          '[data-message-author="assistant"]:last-of-type',
+        );
+      } catch {
+        // Timeout: extract whatever content exists
+        logger.warn('Streaming detection timed out, extracting available content');
+      }
 
-    const text = await last.textContent();
-    return text?.trim() ?? '';
+      const text = await last.textContent();
+      const result = text?.trim() ?? '';
+      logger.info({ length: result.length }, 'Response extracted');
+      return result;
+    });
   }
 
   /**

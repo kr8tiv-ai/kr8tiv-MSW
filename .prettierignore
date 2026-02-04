@@ -1,0 +1,7 @@
+dist/
+coverage/
+node_modules/
+.planning/
+docs/
+*.md
+package-lock.json

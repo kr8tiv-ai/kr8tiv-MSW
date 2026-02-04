@@ -108,29 +108,33 @@ MSW creates an **Auto-Conversation Engine** that:
 
 ## Quick Start
 
-```bash
-# Clone
+### Automated Install (Recommended)
+
+**Windows (PowerShell)**:
+```powershell
 git clone https://github.com/Matt-Aurora-Ventures/kr8tiv-MSW.git
 cd kr8tiv-MSW
-
-# Install
-npm install
-
-# Build
-npm run build
-
-# Wire into Claude Code (~/.claude/mcp.json)
-{
-  "mcpServers": {
-    "msw": {
-      "command": "node",
-      "args": ["/path/to/kr8tiv-MSW/dist/mcp/index.js"]
-    }
-  }
-}
+.\setup.ps1
 ```
 
-Then restart your IDE. The MSW tools will appear automatically.
+**Linux/macOS (Bash)**:
+```bash
+git clone https://github.com/Matt-Aurora-Ventures/kr8tiv-MSW.git
+cd kr8tiv-MSW
+chmod +x setup.sh && ./setup.sh
+```
+
+The setup script will:
+- ✅ Install dependencies
+- ✅ Build TypeScript
+- ✅ Configure MCP for Claude Code/Cursor/Windsurf
+- ✅ Set up authentication flow
+
+Then **restart your IDE** and the MSW tools will appear automatically.
+
+### Manual Install
+
+See [SETUP.md](./SETUP.md) for detailed installation and authentication instructions.
 
 ---
 
@@ -138,17 +142,36 @@ Then restart your IDE. The MSW tools will appear automatically.
 
 | Tool | What It Does |
 |------|-------------|
-| `msw_init` | Initialize `.msw/` project directory, run health checks |
+| `msw_init` | Initialize `.msw/` with **Google authentication** and config |
+| `msw_status` | Check job progress, config, or run **health check** (`msw doctor`) |
 | `msw_notebook_add` | Link a NotebookLM notebook URL to the project |
 | `msw_research` | Auto-conversation engine — extract deep knowledge from NotebookLM |
 | `msw_plan` | Generate PRD grounded in research findings |
 | `msw_execute` | Run Ralph loop with NotebookLM feedback injection |
 | `msw_verify` | Validate implementation against requirements |
-| `msw_status` | Check job progress, project config, health |
+
+**New**: `msw_init` now handles authentication automatically. Run `msw_status` with `runHealthCheck: true` for diagnostics.
 
 ---
 
 ## Documentation
+
+### Setup & Troubleshooting
+
+| Document | Description |
+|----------|-------------|
+| **[SETUP.md](./SETUP.md)** | Complete installation and authentication guide |
+| **[TROUBLESHOOTING.md](./TROUBLESHOOTING.md)** | Common issues and solutions |
+| **[CONTRIBUTING.md](./CONTRIBUTING.md)** | Development guidelines and PR process |
+
+### Examples & Workflows
+
+| Example | Description | Time |
+|---------|-------------|------|
+| **[VPS Debugging](./examples/01-vps-debugging.md)** | Fix bot crashes using NotebookLM knowledge | 10 min |
+| **[Feature Planning](./examples/02-feature-planning.md)** | Research → PRD → Execute with GSD + Ralph | 20 min |
+
+### Design & Architecture
 
 All design documents, research reports, and reference material live in [`docs/`](./docs/):
 
@@ -161,7 +184,6 @@ All design documents, research reports, and reference material live in [`docs/`]
 | [Ralph Loop & MCP](docs/ralph-loop-and-mcp.md) | Advanced agentic orchestration |
 | [Strategic Playbook](docs/strategic-playbook.md) | Go-to-market strategy |
 | [GSD Ralph Prompt](docs/GSD_RALPH_PROMPT.md) | GSD + Ralph integration prompt |
-| [SETUP.md](SETUP.md) | Detailed setup instructions |
 
 ---
 

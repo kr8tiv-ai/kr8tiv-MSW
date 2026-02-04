@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <title>Mock NotebookLM</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        padding: 20px;
+        max-width: 800px;
+        margin: 0 auto;
+      }
+      .chat-input {
+        width: 100%;
+        padding: 10px;
+        margin: 10px 0;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+      }
+      .send-button {
+        padding: 10px 20px;
+        background: #1a73e8;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+      }
+      .suggested-topics {
+        margin: 20px 0;
+      }
+      .topic-pill {
+        display: inline-block;
+        margin: 5px;
+        padding: 10px 15px;
+        border: 1px solid #ccc;
+        border-radius: 20px;
+        cursor: pointer;
+        background: white;
+      }
+      .topic-pill:hover {
+        background: #f5f5f5;
+      }
+      .response {
+        padding: 15px;
+        background: #f5f5f5;
+        margin: 10px 0;
+        border-radius: 8px;
+      }
+      .citation {
+        font-size: 0.9em;
+        color: #666;
+        margin-top: 8px;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Mock NotebookLM</h1>
+
+    <!-- Chat input (mimics real NotebookLM structure) -->
+    <textarea
+      role="textbox"
+      aria-label="Ask about your notes"
+      class="chat-input"
+      id="chat-input"
+      rows="3"></textarea>
+    <button
+      role="button"
+      aria-label="Send message"
+      class="send-button"
+      onclick="handleSend()">Send</button>
+
+    <!-- Suggested topics (mimics topic pills) -->
+    <div role="list" aria-label="Suggested topics" class="suggested-topics">
+      <button
+        role="button"
+        data-topic="authentication"
+        class="topic-pill"
+        onclick="handleTopicClick('authentication')">
+        Learn about authentication
+      </button>
+      <button
+        role="button"
+        data-topic="testing"
+        class="topic-pill"
+        onclick="handleTopicClick('testing')">
+        Learn about testing patterns
+      </button>
+      <button
+        role="button"
+        data-topic="browser"
+        class="topic-pill"
+        onclick="handleTopicClick('browser')">
+        Learn about browser automation
+      </button>
+    </div>
+
+    <!-- Response container -->
+    <div id="responses" aria-live="polite"></div>
+
+    <script>
+      const responses = {
+        authentication: "Authentication in MSW uses persistent Chrome profiles to maintain Google session cookies across restarts.",
+        testing: "Testing follows a three-tier approach: unit tests with mocked dependencies, integration tests with real components, and E2E tests with the full system.",
+        browser: "Browser automation uses Playwright with stealth plugins to avoid bot detection and humanized delays for natural interaction patterns.",
+      };
+
+      const citations = {
+        authentication: ["auth.md", "browser.md"],
+        testing: ["testing.md", "vitest.config.ts"],
+        browser: ["browser.md", "stealth.md"],
+      };
+
+      function handleTopicClick(topic) {
+        const responseDiv = document.createElement('div');
+        responseDiv.className = 'response';
+        responseDiv.setAttribute('data-message-author', 'assistant');
+        responseDiv.setAttribute('data-streaming', 'true');
+
+        const answerText = responses[topic] || 'No response available for this topic.';
+        const sourceCitations = citations[topic] || [];
+
+        responseDiv.innerHTML = `
+          <p>${answerText}</p>
+          <div class="citation">
+            ${sourceCitations.map(src => `[Source: ${src}]`).join(', ')}
+          </div>
+        `;
+
+        document.getElementById('responses').appendChild(responseDiv);
+
+        // Simulate streaming completion (for wait detection tests)
+        setTimeout(() => {
+          responseDiv.setAttribute('data-streaming', 'false');
+        }, 200);
+      }
+
+      function handleSend() {
+        const input = document.getElementById('chat-input');
+        const query = input.value.toLowerCase();
+
+        // Match query to topic
+        if (query.includes('auth')) {
+          handleTopicClick('authentication');
+        } else if (query.includes('test')) {
+          handleTopicClick('testing');
+        } else if (query.includes('browser')) {
+          handleTopicClick('browser');
+        } else {
+          const responseDiv = document.createElement('div');
+          responseDiv.className = 'response';
+          responseDiv.setAttribute('data-message-author', 'assistant');
+          responseDiv.setAttribute('data-streaming', 'false');
+          responseDiv.innerHTML = '<p>I can help with authentication, testing, and browser automation topics.</p>';
+          document.getElementById('responses').appendChild(responseDiv);
+        }
+
+        input.value = '';
+      }
+    </script>
+  </body>
+</html>

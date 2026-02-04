@@ -15,6 +15,12 @@ import {
   DEFAULT_BROWSER_CONFIG,
   DEFAULT_USER_AGENT,
 } from '../types/browser.js';
+import { createLogger } from '../logging/index.js';
+import { runHealthCheck } from '../diagnostics/index.js';
+import { getMetricsCollector } from '../metrics/index.js';
+
+const logger = createLogger('browser-driver');
+const metrics = getMetricsCollector();
 
 export class BrowserDriver {
   private config: LaunchOptions;
@@ -38,34 +44,58 @@ export class BrowserDriver {
    */
   async launch(): Promise<BrowserContext> {
     if (this.context) {
+      logger.debug('Browser context already launched');
       return this.context;
     }
 
-    // Ensure profile directory exists and acquire lock
-    const profileDir = this.profileManager.getProfileDir();
+    return metrics.measureAsync('browser.launch', async () => {
+      logger.info('Launching browser context');
 
-    // Get stealth-configured chromium
-    const chromium = configureStealthBrowser();
+      // Run health checks before launching browser
+      const healthCheck = await runHealthCheck({ autoFix: true });
+      const failedChecks = healthCheck.checks.filter(c => !c.passed);
+      logger.info({
+        status: healthCheck.status,
+        canProceed: healthCheck.canProceed,
+        failedChecks: failedChecks.length,
+        appliedFixes: healthCheck.fixes.filter(f => f.success).length
+      }, 'Pre-launch health check completed');
 
-    const launchArgs = [
-      '--disable-blink-features=AutomationControlled',
-      '--no-first-run',
-      '--no-default-browser-check',
-      ...(this.config.args ?? []),
-    ];
+      if (!healthCheck.canProceed) {
+        logger.error({ failedChecks }, 'Health check failed - cannot proceed');
+        throw new Error(
+          `Browser launch blocked by health check failures:\n${failedChecks.map(c => `- ${c.message}`).join('\n')}`
+        );
+      }
 
-    this.context = await chromium.launchPersistentContext(
-      profileDir,
-      {
-        headless: false, // Hardcoded: Google detects headless mode
-        args: launchArgs,
-        viewport: this.config.viewport,
-        userAgent: this.config.userAgent ?? DEFAULT_USER_AGENT,
-        ignoreDefaultArgs: ['--enable-automation'],
-      },
-    );
+      // Ensure profile directory exists and acquire lock
+      const profileDir = this.profileManager.getProfileDir();
+      logger.debug({ profileDir }, 'Profile directory acquired');
 
-    return this.context;
+      // Get stealth-configured chromium
+      const chromium = configureStealthBrowser();
+
+      const launchArgs = [
+        '--disable-blink-features=AutomationControlled',
+        '--no-first-run',
+        '--no-default-browser-check',
+        ...(this.config.args ?? []),
+      ];
+
+      this.context = await chromium.launchPersistentContext(
+        profileDir,
+        {
+          headless: false, // Hardcoded: Google detects headless mode
+          args: launchArgs,
+          viewport: this.config.viewport,
+          userAgent: this.config.userAgent ?? DEFAULT_USER_AGENT,
+          ignoreDefaultArgs: ['--enable-automation'],
+        },
+      );
+
+      logger.info('Browser context launched successfully');
+      return this.context;
+    });
   }
 
   /**
@@ -84,10 +114,13 @@ export class BrowserDriver {
    */
   async close(): Promise<void> {
     if (this.context) {
+      logger.info('Closing browser context');
       await this.context.close();
       this.context = null;
+      logger.debug('Browser context closed');
     }
     this.profileManager.releaseLock();
+    logger.debug('Profile lock released');
   }
 
   /**

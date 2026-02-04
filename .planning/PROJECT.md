@@ -16,6 +16,7 @@ Zero manual copy-paste between NotebookLM and coding agents — when an agent hi
 
 ### Active
 
+**Core Features:**
 - [ ] Auto-Conversation Engine that detects and clicks all relevant suggested topics in NotebookLM
 - [ ] Relevance scoring (0-100) for each topic using local LLM evaluation
 - [ ] Multi-level topic expansion (up to 10 levels deep) until no new relevant topics appear
@@ -27,12 +28,34 @@ Zero manual copy-paste between NotebookLM and coding agents — when an agent hi
 - [ ] Layered browser strategy: easiest implementation first, API fallback, full Playwright control
 - [ ] Query batching to optimize NotebookLM's 50 queries/day limit
 
-### Out of Scope
+**Production Hardening:**
+- [ ] Comprehensive test suite (unit, integration, E2E) with Vitest
+- [ ] CI/CD pipeline via GitHub Actions with multi-Node validation
+- [ ] Enhanced error logging with structured logs to `.msw/logs/`
+- [ ] Rate limiting handler to prevent API exhaustion
+- [ ] Interactive demo mode for new user onboarding
+- [ ] Session management dashboard for tracking active operations
+- [ ] Offline mode with query caching for degraded connectivity
+- [ ] Performance metrics tracking (timing, cache hit rates)
+- [ ] Self-healing diagnostics that auto-fix common issues
+- [ ] Multi-notebook support for switching between knowledge bases
+
+### Out of Scope (v1.0)
 
 - Web UI for notebook management — CLI/MCP first
 - Multi-notebook simultaneous routing — single notebook per session for v1
 - Custom relevance models — use local LLM scoring initially
 - Non-MCP integration (CLI-only mode) — MCP compatibility is primary constraint
+- **Custom NotebookLM alternative — deferred to v2.0** (RAG system with vector DB as NotebookLM replacement)
+
+### Future Milestones
+
+**v2.0 Vision: Custom RAG Backend**
+- Build MSW's own NotebookLM alternative using RAG architecture
+- Remove dependency on Google's NotebookLM (eliminates bot detection, rate limits, UI brittleness)
+- Components: Document parser, vector database (Pinecone/Weaviate/Chroma), embeddings (OpenAI/local), chat interface
+- Maintain MCP compatibility with same tool interface
+- Support both NotebookLM (v1.0) and custom RAG (v2.0) backends via configuration
 
 ## Context
 
@@ -70,4 +93,4 @@ Zero manual copy-paste between NotebookLM and coding agents — when an agent hi
 | Power users as v1 target | They understand the value, can tolerate rough edges | — Pending |
 
 ---
-*Last updated: 2026-02-02 after initialization*
+*Last updated: 2026-02-03 after adding production hardening scope*

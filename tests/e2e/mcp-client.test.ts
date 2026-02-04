@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+// vitest globals enabled - no import needed
 import { createTestClient, type TestClient } from "./helpers/spawn-server.js";
 import fs from "node:fs";
 import os from "node:os";
