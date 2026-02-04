@@ -45,16 +45,16 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### MCP Server
 
-- [ ] **MCP-01**: Server exposes tools via MCP SDK stdio transport
-- [ ] **MCP-02**: `msw_init` tool initializes MSW for a project directory
-- [ ] **MCP-03**: `msw_research` tool triggers NotebookLM extraction session
-- [ ] **MCP-04**: `msw_plan` tool generates PRD from research findings
-- [ ] **MCP-05**: `msw_execute` tool runs Ralph loop with NotebookLM feedback
-- [ ] **MCP-06**: `msw_verify` tool confirms implementation against requirements
-- [ ] **MCP-07**: `msw_status` tool reports current progress and state
-- [ ] **MCP-08**: `msw_notebook_add` tool adds notebooks to library
-- [ ] **MCP-09**: Long-running operations return job IDs with polling support
-- [ ] **MCP-10**: Compatible with Claude Code, Windsurf, and Cursor
+- [x] **MCP-01**: Server exposes tools via MCP SDK stdio transport
+- [x] **MCP-02**: `msw_init` tool initializes MSW for a project directory
+- [x] **MCP-03**: `msw_research` tool triggers NotebookLM extraction session
+- [x] **MCP-04**: `msw_plan` tool generates PRD from research findings
+- [x] **MCP-05**: `msw_execute` tool runs Ralph loop with NotebookLM feedback
+- [x] **MCP-06**: `msw_verify` tool confirms implementation against requirements
+- [x] **MCP-07**: `msw_status` tool reports current progress and state
+- [x] **MCP-08**: `msw_notebook_add` tool adds notebooks to library
+- [x] **MCP-09**: Long-running operations return job IDs with polling support
+- [x] **MCP-10**: Compatible with Claude Code, Windsurf, and Cursor
 
 ### GSD Integration
 
@@ -177,16 +177,16 @@ Which phases cover which requirements. Updated during roadmap creation.
 | KNOW-02 | Phase 3 | Complete |
 | KNOW-03 | Phase 3 | Complete |
 | KNOW-04 | Phase 3 | Complete |
-| MCP-01 | Phase 4 | Pending |
-| MCP-02 | Phase 4 | Pending |
-| MCP-03 | Phase 4 | Pending |
-| MCP-04 | Phase 4 | Pending |
-| MCP-05 | Phase 4 | Pending |
-| MCP-06 | Phase 4 | Pending |
-| MCP-07 | Phase 4 | Pending |
-| MCP-08 | Phase 4 | Pending |
-| MCP-09 | Phase 4 | Pending |
-| MCP-10 | Phase 4 | Pending |
+| MCP-01 | Phase 4 | Complete |
+| MCP-02 | Phase 4 | Complete |
+| MCP-03 | Phase 4 | Complete |
+| MCP-04 | Phase 4 | Complete |
+| MCP-05 | Phase 4 | Complete |
+| MCP-06 | Phase 4 | Complete |
+| MCP-07 | Phase 4 | Complete |
+| MCP-08 | Phase 4 | Complete |
+| MCP-09 | Phase 4 | Complete |
+| MCP-10 | Phase 4 | Complete |
 | GSD-01 | Phase 5 | Pending |
 | GSD-02 | Phase 5 | Pending |
 | GSD-03 | Phase 5 | Pending |
