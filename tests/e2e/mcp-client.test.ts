@@ -24,17 +24,18 @@ describe("MCP E2E smoke tests", () => {
     }
   });
 
-  it("server lists all 7 tools", async () => {
+  it("server lists all 8 tools", async () => {
     const result = await tc.client.listTools();
     const names = result.tools.map((t) => t.name);
     expect(names).toContain("msw_init");
+    expect(names).toContain("msw_discover");
     expect(names).toContain("msw_research");
     expect(names).toContain("msw_plan");
     expect(names).toContain("msw_execute");
     expect(names).toContain("msw_verify");
     expect(names).toContain("msw_status");
     expect(names).toContain("msw_notebook_add");
-    expect(result.tools.length).toBeGreaterThanOrEqual(7);
+    expect(result.tools.length).toBeGreaterThanOrEqual(8);
   });
 
   it("msw_init creates config", async () => {

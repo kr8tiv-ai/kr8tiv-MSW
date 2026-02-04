@@ -2,6 +2,7 @@ export { registerTools } from "./registry.js";
 export type { ToolRegistrar } from "./registry.js";
 
 export { registerMswInit } from "./msw-init.js";
+export { registerMswDiscover } from "./msw-discover.js";
 export { registerMswStatus } from "./msw-status.js";
 export { registerMswResearch } from "./msw-research.js";
 export { registerMswPlan } from "./msw-plan.js";

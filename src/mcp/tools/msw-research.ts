@@ -8,6 +8,7 @@ import type { Job } from "../jobs/types.js";
 
 interface MswConfig {
   notebookUrls?: string[];
+  discoveryComplete?: boolean;
   [key: string]: unknown;
 }
 
@@ -225,6 +226,51 @@ export function registerMswResearch(server: McpServer): void {
               type: "text" as const,
               text: JSON.stringify({
                 error: "Failed to parse .msw/config.json",
+              }),
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      // ENFORCE: Discovery must be completed before research
+      if (!config.discoveryComplete) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({
+                error: "Discovery not complete",
+                reason: "MSW protocol requires running msw_discover before research.",
+                action: "Run msw_discover first to analyze your project and find relevant notebooks.",
+                command: `msw_discover projectDir="${projectDir}" goal="<your goal>"`,
+                why: [
+                  "Discovery analyzes your project context",
+                  "Finds relevant libraries and documentation",
+                  "Locates or creates NotebookLM notebooks with proper sources",
+                  "Ensures research is grounded in relevant material",
+                ],
+              }),
+            },
+          ],
+          isError: true,
+        };
+      }
+
+      // ENFORCE: Must have notebooks configured
+      if (!config.notebookUrls || config.notebookUrls.length === 0) {
+        return {
+          content: [
+            {
+              type: "text" as const,
+              text: JSON.stringify({
+                error: "No notebooks configured",
+                reason: "Research requires at least one NotebookLM notebook.",
+                action: "Either run msw_discover to find notebooks, or add one with msw_notebook_add.",
+                commands: [
+                  `msw_discover projectDir="${projectDir}" goal="<your goal>"`,
+                  `msw_notebook_add projectDir="${projectDir}" url="<notebook-url>"`,
+                ],
               }),
             },
           ],
