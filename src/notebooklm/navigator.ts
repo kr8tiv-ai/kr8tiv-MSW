@@ -5,6 +5,9 @@
 
 import type { Page } from 'playwright';
 import type { NotebookConnection } from '../types/browser.js';
+import { createLogger } from '../logging/index.js';
+
+const logger = createLogger('notebook-navigator');
 
 export class NotebookNavigator {
   private page: Page;
@@ -18,6 +21,7 @@ export class NotebookNavigator {
    * and wait for the chat interface to become ready.
    */
   async connect(notebookUrl: string): Promise<NotebookConnection> {
+    logger.info({ notebookUrl }, 'Navigating to notebook');
     await this.page.goto(notebookUrl, { waitUntil: 'domcontentloaded' });
 
     // Check if sign-in is required
@@ -27,16 +31,19 @@ export class NotebookNavigator {
       .catch(() => false);
 
     if (needsAuth) {
+      logger.error('NotebookLM authentication required');
       throw new Error(
         'NotebookLM requires authentication. Please run MSW once with a visible browser to log in manually, then restart.',
       );
     }
 
     // Wait for chat input to appear, indicating readiness
+    logger.debug('Waiting for chat input to become ready');
     await this.page
       .getByRole('textbox', { name: /ask|type/i })
       .waitFor({ state: 'visible', timeout: 30000 });
 
+    logger.info('Successfully connected to notebook');
     return { connected: true, url: notebookUrl };
   }
 

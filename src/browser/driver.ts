@@ -15,6 +15,9 @@ import {
   DEFAULT_BROWSER_CONFIG,
   DEFAULT_USER_AGENT,
 } from '../types/browser.js';
+import { createLogger } from '../logging/index.js';
+
+const logger = createLogger('browser-driver');
 
 export class BrowserDriver {
   private config: LaunchOptions;
@@ -38,11 +41,15 @@ export class BrowserDriver {
    */
   async launch(): Promise<BrowserContext> {
     if (this.context) {
+      logger.debug('Browser context already launched');
       return this.context;
     }
 
+    logger.info('Launching browser context');
+
     // Ensure profile directory exists and acquire lock
     const profileDir = this.profileManager.getProfileDir();
+    logger.debug({ profileDir }, 'Profile directory acquired');
 
     // Get stealth-configured chromium
     const chromium = configureStealthBrowser();
@@ -65,6 +72,7 @@ export class BrowserDriver {
       },
     );
 
+    logger.info('Browser context launched successfully');
     return this.context;
   }
 
@@ -84,10 +92,13 @@ export class BrowserDriver {
    */
   async close(): Promise<void> {
     if (this.context) {
+      logger.info('Closing browser context');
       await this.context.close();
       this.context = null;
+      logger.debug('Browser context closed');
     }
     this.profileManager.releaseLock();
+    logger.debug('Profile lock released');
   }
 
   /**
