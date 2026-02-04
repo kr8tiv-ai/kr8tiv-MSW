@@ -102,20 +102,20 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Production Hardening
 
-- [ ] **HARD-01**: Structured logging via Pino to `.msw/logs/` with rotation
-- [ ] **HARD-02**: Log levels configurable (debug, info, warn, error) with environment variable
-- [ ] **HARD-03**: Rate limiting handler tracks NotebookLM requests and warns before quota
-- [ ] **HARD-04**: Rate limit dashboard shows current usage, remaining quota, reset time
-- [ ] **HARD-05**: Interactive demo mode for new users with guided workflow
-- [ ] **HARD-06**: Demo mode uses sample notebook with safe fallback if unavailable
-- [ ] **HARD-07**: Self-healing diagnostics detect common issues (Chrome profile lock, selector failures)
-- [ ] **HARD-08**: Auto-fix common issues (unlock Chrome profile, refresh selectors, restart browser)
-- [ ] **HARD-09**: Performance metrics tracking (query timing, response time, cache hit rate)
-- [ ] **HARD-10**: Metrics export to JSON for analysis and monitoring
-- [ ] **HARD-11**: Session management dashboard shows active operations, progress, cancel option
-- [ ] **HARD-12**: Session persistence across crashes with resumption support
-- [ ] **HARD-13**: Graceful degradation when NotebookLM is unavailable (use cached responses)
-- [ ] **HARD-14**: Health check endpoint exposes system status (browser ready, notebook connected, quota remaining)
+- [x] **HARD-01**: Structured logging via Pino to `.msw/logs/` with rotation
+- [x] **HARD-02**: Log levels configurable (debug, info, warn, error) with environment variable
+- [x] **HARD-03**: Rate limiting handler tracks NotebookLM requests and warns before quota
+- [x] **HARD-04**: Rate limit dashboard shows current usage, remaining quota, reset time
+- [x] **HARD-05**: Interactive demo mode for new users with guided workflow
+- [x] **HARD-06**: Demo mode uses sample notebook with safe fallback if unavailable
+- [x] **HARD-07**: Self-healing diagnostics detect common issues (Chrome profile lock, selector failures)
+- [x] **HARD-08**: Auto-fix common issues (unlock Chrome profile, refresh selectors, restart browser)
+- [x] **HARD-09**: Performance metrics tracking (query timing, response time, cache hit rate)
+- [x] **HARD-10**: Metrics export to JSON for analysis and monitoring
+- [x] **HARD-11**: Session management dashboard shows active operations, progress, cancel option
+- [x] **HARD-12**: Session persistence across crashes with resumption support
+- [x] **HARD-13**: Graceful degradation when NotebookLM is unavailable (use cached responses)
+- [x] **HARD-14**: Health check endpoint exposes system status (browser ready, notebook connected, quota remaining)
 
 ## v2 Requirements
 
@@ -219,20 +219,20 @@ Which phases cover which requirements. Updated during roadmap creation.
 | CI-08 | Phase 8 | Pending |
 | CI-09 | Phase 8 | Pending |
 | CI-10 | Phase 8 | Pending |
-| HARD-01 | Phase 9 | Pending |
-| HARD-02 | Phase 9 | Pending |
-| HARD-03 | Phase 9 | Pending |
-| HARD-04 | Phase 9 | Pending |
-| HARD-05 | Phase 9 | Pending |
-| HARD-06 | Phase 9 | Pending |
-| HARD-07 | Phase 9 | Pending |
-| HARD-08 | Phase 9 | Pending |
-| HARD-09 | Phase 9 | Pending |
-| HARD-10 | Phase 9 | Pending |
-| HARD-11 | Phase 9 | Pending |
-| HARD-12 | Phase 9 | Pending |
-| HARD-13 | Phase 9 | Pending |
-| HARD-14 | Phase 9 | Pending |
+| HARD-01 | Phase 9 | Complete |
+| HARD-02 | Phase 9 | Complete |
+| HARD-03 | Phase 9 | Complete |
+| HARD-04 | Phase 9 | Complete |
+| HARD-05 | Phase 9 | Complete |
+| HARD-06 | Phase 9 | Complete |
+| HARD-07 | Phase 9 | Complete |
+| HARD-08 | Phase 9 | Complete |
+| HARD-09 | Phase 9 | Complete |
+| HARD-10 | Phase 9 | Complete |
+| HARD-11 | Phase 9 | Complete |
+| HARD-12 | Phase 9 | Complete |
+| HARD-13 | Phase 9 | Complete |
+| HARD-14 | Phase 9 | Complete |
 
 **Coverage:**
 - v1 requirements: 79 total
