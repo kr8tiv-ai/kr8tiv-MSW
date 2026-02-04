@@ -18,13 +18,13 @@ Requirements for initial release. Each maps to roadmap phases.
 
 ### Auto-Conversation Engine
 
-- [ ] **AUTO-01**: Topic detection finds all suggested topic pills in NotebookLM UI
-- [ ] **AUTO-02**: Auto-click triggers detected topics and extracts responses
-- [ ] **AUTO-03**: Multi-level expansion continues up to 10 levels until no new relevant topics
-- [ ] **AUTO-04**: Relevance scoring (0-100) via local LLM evaluates each topic before clicking
-- [ ] **AUTO-05**: Configurable relevance threshold (default: 30) filters low-value topics
-- [ ] **AUTO-06**: Query batching optimizes within NotebookLM's 50 queries/day limit
-- [ ] **AUTO-07**: Rate limit tracking warns before approaching daily quota
+- [x] **AUTO-01**: Topic detection finds all suggested topic pills in NotebookLM UI
+- [x] **AUTO-02**: Auto-click triggers detected topics and extracts responses
+- [x] **AUTO-03**: Multi-level expansion continues up to 10 levels until no new relevant topics
+- [x] **AUTO-04**: Relevance scoring (0-100) via local LLM evaluates each topic before clicking
+- [x] **AUTO-05**: Configurable relevance threshold (default: 30) filters low-value topics
+- [x] **AUTO-06**: Query batching optimizes within NotebookLM's 50 queries/day limit
+- [x] **AUTO-07**: Rate limit tracking warns before approaching daily quota
 
 ### Bidirectional Communication
 
@@ -159,13 +159,13 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BROW-04 | Phase 1 | Complete |
 | BROW-05 | Phase 1 | Complete |
 | BROW-06 | Phase 1 | Complete |
-| AUTO-01 | Phase 2 | Pending |
-| AUTO-02 | Phase 2 | Pending |
-| AUTO-03 | Phase 2 | Pending |
-| AUTO-04 | Phase 2 | Pending |
-| AUTO-05 | Phase 2 | Pending |
-| AUTO-06 | Phase 2 | Pending |
-| AUTO-07 | Phase 2 | Pending |
+| AUTO-01 | Phase 2 | Complete |
+| AUTO-02 | Phase 2 | Complete |
+| AUTO-03 | Phase 2 | Complete |
+| AUTO-04 | Phase 2 | Complete |
+| AUTO-05 | Phase 2 | Complete |
+| AUTO-06 | Phase 2 | Complete |
+| AUTO-07 | Phase 2 | Complete |
 | BIDR-01 | Phase 3 | Pending |
 | BIDR-02 | Phase 3 | Pending |
 | BIDR-03 | Phase 3 | Pending |
