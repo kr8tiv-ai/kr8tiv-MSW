@@ -10,18 +10,18 @@ See: .planning/PROJECT.md (updated 2026-02-03)
 ## Current Position
 
 Phase: 9 of 9 (Production Hardening)
-Plan: 4 of 6 in current phase
-Status: In progress - Self-healing diagnostics complete
-Last activity: 2026-02-04 - Completed 09-04-PLAN.md (Self-Healing Diagnostics)
+Plan: 5 of 6 in current phase
+Status: In progress - Performance metrics tracking complete
+Last activity: 2026-02-04 - Completed 09-05-PLAN.md (Performance Metrics Tracking)
 
-Progress: [████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 32% (18/56 plans)
+Progress: [█████████████████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░] 34% (19/56 plans)
 
 ## Performance Metrics
 
 **Velocity:**
-- Total plans completed: 18
-- Average duration: ~13 min
-- Total execution time: ~4 hours
+- Total plans completed: 19
+- Average duration: ~12 min
+- Total execution time: ~4 hours 5 min
 
 **By Phase:**
 
@@ -35,7 +35,7 @@ Progress: [███████████████████████
 | 6. E2E Integration | 0/5 | - | - |
 | 7. Testing Suite | 6/6 | ~107min | ~17.8min |
 | 8. CI/CD Pipeline | 5/5 | ~26min | ~5min |
-| 9. Production Hardening | 4/6 | ~15min | ~3.75min |
+| 9. Production Hardening | 5/6 | ~20min | ~4min |
 
 **Recent Trend:**
 - Last 5 plans: 08-02, 08-03, 08-04, 08-05, 09-01
@@ -99,6 +99,10 @@ Recent decisions affecting current work:
 - [09-04]: Auto-fix only clears locks if Chrome hasn't modified them in last 5 seconds (safety check)
 - [09-04]: Selector diagnostic reports include HTML snapshots (10KB limit) and pattern-based suggestions
 - [09-04]: Health checker returns healthy/degraded/unhealthy status with canProceed flag
+- [09-05]: Node.js perf_hooks chosen for high-resolution, non-blocking performance measurement
+- [09-05]: Statistical percentiles (P50/P90/P95/P99) provide actionable tail latency insights
+- [09-05]: MAX_ENTRIES limit (10,000) with 10% pruning prevents unbounded memory growth
+- [09-05]: JSON export to .msw/metrics-*.json enables integration with analysis tooling
 
 ### Pending Todos
 
@@ -182,21 +186,22 @@ All 5 plans executed successfully:
 Completed plans:
 1. **09-01:** Structured logging infrastructure (Pino with MCP-safe output, daily rotation)
 2. **09-02:** Rate limiting handler (quota tracking, usage dashboard)
-3. **09-03:** Performance metrics tracking (perf_hooks, JSON export)
+3. **09-03:** (Skipped - number conflict in roadmap)
 4. **09-04:** Self-healing diagnostics (Chrome locks, selector failures, health checks)
+5. **09-05:** Performance metrics tracking (perf_hooks with percentile statistics)
 
 **Key Components Built:**
 - `src/logging/` - Pino structured logging with worker thread transports
 - `src/rate-limiting/` - QuotaTracker with 50 queries/day limit and 80% warning threshold
-- `src/metrics/` - MetricsCollector using perf_hooks for timing data
+- `src/metrics/` - MetricsCollector using perf_hooks with P50/P90/P95/P99 statistics
 - `src/diagnostics/` - Auto-fixer for Chrome locks, selector diagnostics, health checker
 
-**Next:** 09-05 - Interactive demo mode
+**Next:** 09-06 - Final production hardening plan
 
 ## Session Continuity
 
 Last session: 2026-02-04
-Stopped at: Completed 09-04-PLAN.md (Self-Healing Diagnostics)
+Stopped at: Completed 09-05-PLAN.md (Performance Metrics Tracking)
 Resume file: None
 
 ---
