@@ -1,9 +1,61 @@
 import fs from "node:fs";
 import path from "node:path";
+import os from "node:os";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { PipelineOrchestrator } from "../../pipeline/orchestrator.js";
 import { Authenticator } from "../../auth/index.js";
+import { createLogger } from "../../logging/index.js";
+
+const logger = createLogger('msw-init');
+
+interface NotebookLibraryEntry {
+  id: string;
+  url: string;
+  name: string;
+  description: string;
+  topics: string[];
+  use_cases: string[];
+  last_used?: string;
+  use_count?: number;
+}
+
+interface NotebookLibrary {
+  notebooks: NotebookLibraryEntry[];
+  active_notebook_id?: string;
+  version?: string;
+}
+
+/**
+ * Auto-discover notebooks from the NotebookLM MCP library.
+ * Looks for the library.json file in standard locations.
+ */
+function discoverNotebooks(): { urls: string[]; source: string; notebooks: NotebookLibraryEntry[] } {
+  // Standard NotebookLM MCP library locations (cross-platform)
+  const possiblePaths = [
+    path.join(os.homedir(), 'AppData', 'Local', 'notebooklm-mcp', 'Data', 'library.json'), // Windows
+    path.join(os.homedir(), '.local', 'share', 'notebooklm-mcp', 'library.json'), // Linux
+    path.join(os.homedir(), 'Library', 'Application Support', 'notebooklm-mcp', 'library.json'), // macOS
+    path.join(os.homedir(), '.notebooklm-mcp', 'library.json'), // Fallback
+  ];
+
+  for (const libraryPath of possiblePaths) {
+    if (fs.existsSync(libraryPath)) {
+      try {
+        const data = JSON.parse(fs.readFileSync(libraryPath, 'utf-8')) as NotebookLibrary;
+        if (data.notebooks && Array.isArray(data.notebooks)) {
+          const urls = data.notebooks.map(n => n.url);
+          logger.info({ count: urls.length, source: libraryPath }, 'Auto-discovered notebooks from NotebookLM library');
+          return { urls, source: libraryPath, notebooks: data.notebooks };
+        }
+      } catch (err) {
+        logger.warn({ error: err, path: libraryPath }, 'Failed to parse NotebookLM library');
+      }
+    }
+  }
+
+  return { urls: [], source: 'none', notebooks: [] };
+}
 
 export function registerMswInit(server: McpServer): void {
   server.tool(
@@ -27,6 +79,21 @@ export function registerMswInit(server: McpServer): void {
         const researchDir = path.join(mswDir, "research");
 
         fs.mkdirSync(researchDir, { recursive: true });
+
+        // Auto-discover notebooks if none provided
+        let discoveredNotebooks: NotebookLibraryEntry[] = [];
+        let discoverySource = 'none';
+
+        if (!notebookUrls || notebookUrls.length === 0) {
+          const discovery = discoverNotebooks();
+          if (discovery.urls.length > 0) {
+            notebookUrls = discovery.urls;
+            discoveredNotebooks = discovery.notebooks;
+            discoverySource = discovery.source;
+            logger.info({ count: discovery.urls.length, source: discoverySource }, 'Auto-populated notebooks from NotebookLM library');
+            console.log(`[msw] Auto-discovered ${discovery.urls.length} notebooks from ${discoverySource}`);
+          }
+        }
 
         const config = {
           initialized: new Date().toISOString(),
@@ -97,6 +164,17 @@ export function registerMswInit(server: McpServer): void {
                   profilePath: authResult.profilePath,
                   validatedAt: authResult.validatedAt,
                 } : { skipped: true },
+                notebooks: {
+                  count: notebookUrls?.length ?? 0,
+                  autoDiscovered: discoveredNotebooks.length > 0,
+                  source: discoverySource,
+                  entries: discoveredNotebooks.map(n => ({
+                    id: n.id,
+                    name: n.name,
+                    description: n.description,
+                    topics: n.topics,
+                  })),
+                },
                 health: initResult.health,
                 degraded: orchestrator.getDegradedCapabilities(),
                 resumed: initResult.resumed,
