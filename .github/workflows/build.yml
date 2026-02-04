@@ -1,0 +1,52 @@
+name: Build Validation
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+    branches: [main, master]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: TypeScript type check
+        run: npm run check
+
+      - name: Build distribution
+        run: npm run build
+
+      - name: Verify dist/ is up-to-date (check-dist)
+        run: |
+          if [ -n "$(git status --porcelain dist/)" ]; then
+            echo "::error::dist/ directory is out of sync with source. Run 'npm run build' locally and commit changes."
+            echo ""
+            echo "The following files in dist/ are different from what was committed:"
+            git status --porcelain dist/
+            echo ""
+            echo "Diff of changes:"
+            git diff dist/
+            exit 1
+          fi
+          echo "dist/ is up-to-date with source code"
+
+      - name: Upload dist/ artifact (on failure)
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: expected-dist
+          path: dist/
+          retention-days: 7
