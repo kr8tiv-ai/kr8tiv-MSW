@@ -4,7 +4,7 @@ import os from "node:os";
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import { createLogger } from "../../logging/index.js";
-import { checkProviders, research } from "../../llm/router.js";
+import { checkProviders, research, webSearch } from "../../llm/router.js";
 
 const logger = createLogger('msw-discover');
 
@@ -314,12 +314,17 @@ export function registerMswDiscover(server: McpServer): void {
         const discovery = await discoverTopicsAndLibraries(context, goal);
         logger.info({ discovery }, "Discovery complete");
 
-        // 5. Find matching notebooks in library
+        // 5. Web search for current documentation (if LLM available)
+        console.log("[msw] Searching web for current documentation...");
+        const webResults = await webSearch(context.technologies, goal);
+        logger.info({ sourceCount: webResults.sources.length }, "Web search complete");
+
+        // 6. Find matching notebooks in library
         const libraryPath = getNotebookLibraryPath();
         const matchingNotebooks = findMatchingNotebooks(discovery.topics, libraryPath);
         logger.info({ count: matchingNotebooks.length }, "Found matching notebooks");
 
-        // 6. Update config with discovery results
+        // 7. Update config with discovery results
         const existingConfig = JSON.parse(fs.readFileSync(configPath, "utf-8")) as MswConfig;
         const updatedConfig: MswConfig = {
           ...existingConfig,
@@ -333,7 +338,12 @@ export function registerMswDiscover(server: McpServer): void {
         fs.writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2));
         logger.info({ configPath }, "Config updated with discovery results");
 
-        // 7. Return comprehensive result
+        // 8. Return comprehensive result
+        const allSources = [
+          ...webResults.sources,
+          ...discovery.suggestedSources.map(s => ({ title: s, url: '', description: s })),
+        ];
+
         const result = {
           success: true,
           projectContext: {
@@ -346,6 +356,11 @@ export function registerMswDiscover(server: McpServer): void {
             libraries: discovery.libraries,
             suggestedSources: discovery.suggestedSources,
             reasoning: discovery.reasoning,
+          },
+          webSearch: {
+            sources: webResults.sources,
+            recommendations: webResults.recommendations,
+            reasoning: webResults.reasoning,
           },
           notebooks: {
             found: matchingNotebooks.length,
@@ -363,9 +378,10 @@ export function registerMswDiscover(server: McpServer): void {
               ]
             : [
                 "No matching notebooks found.",
-                "Create a new notebook at https://notebooklm.google.com with these sources:",
-                ...discovery.suggestedSources.slice(0, 3),
-                "Then add it with: msw_notebook_add",
+                "Create a new notebook at https://notebooklm.google.com",
+                "Add these sources to your notebook:",
+                ...allSources.slice(0, 5).map(s => s.url ? `- ${s.title}: ${s.url}` : `- ${s.title}`),
+                "Then add the notebook with: msw_notebook_add",
               ],
           readyForResearch: matchingNotebooks.length > 0,
         };

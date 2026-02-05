@@ -231,9 +231,79 @@ export async function researchWithGemini(
   return response.content;
 }
 
+/**
+ * Search the web for current documentation and libraries using Gemini's grounding
+ * Returns structured results with URLs
+ */
+export async function webSearchWithGemini(
+  technologies: string[],
+  goal: string
+): Promise<{
+  sources: Array<{ title: string; url: string; description: string }>;
+  recommendations: string[];
+  reasoning: string;
+}> {
+  const techList = technologies.join(', ') || 'general programming';
+  const prompt = `Search the web for the most up-to-date documentation and best practices for this project.
+
+Technologies: ${techList}
+Goal: ${goal}
+
+Find:
+1. Official documentation URLs for the main libraries/frameworks
+2. Best practice guides from 2024-2026
+3. GitHub repositories with good examples
+
+Return ONLY valid JSON (no markdown, no explanation):
+{
+  "sources": [
+    {"title": "Source title", "url": "https://...", "description": "What this source covers"}
+  ],
+  "recommendations": ["Recommendation 1", "Recommendation 2"],
+  "reasoning": "Why these sources are relevant"
+}`;
+
+  logger.info({ technologies, goal }, 'Web searching with Gemini');
+
+  // Use grounding flag for web search
+  const response = await executeGeminiPrompt(prompt, {
+    timeout: 45000,
+  });
+
+  if (!response.success) {
+    logger.warn({ error: response.error }, 'Gemini web search failed');
+    return {
+      sources: [],
+      recommendations: [`Search for "${techList} documentation" manually`],
+      reasoning: 'Web search failed, manual search recommended',
+    };
+  }
+
+  try {
+    const jsonMatch = response.content.match(/\{[\s\S]*\}/);
+    if (jsonMatch) {
+      const parsed = JSON.parse(jsonMatch[0]);
+      return {
+        sources: Array.isArray(parsed.sources) ? parsed.sources : [],
+        recommendations: Array.isArray(parsed.recommendations) ? parsed.recommendations : [],
+        reasoning: parsed.reasoning || 'No reasoning provided',
+      };
+    }
+  } catch (err) {
+    logger.warn({ error: err }, 'Failed to parse web search response');
+  }
+
+  return {
+    sources: [],
+    recommendations: [`Search for "${techList} documentation" manually`],
+    reasoning: 'Failed to parse web search results',
+  };
+}
+
 export default {
   isGeminiAvailable,
   executeGeminiPrompt,
   scoreRelevanceWithGemini,
   researchWithGemini,
+  webSearchWithGemini,
 };

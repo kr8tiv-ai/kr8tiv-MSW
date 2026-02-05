@@ -13,6 +13,7 @@ import {
   isGeminiAvailable,
   scoreRelevanceWithGemini,
   researchWithGemini,
+  webSearchWithGemini,
   type RelevanceScore,
 } from './gemini-provider.js';
 
@@ -236,10 +237,74 @@ export function clearProviderCache(): void {
   statusCacheTime = 0;
 }
 
+/**
+ * Web search for current documentation and libraries
+ */
+export async function webSearch(
+  technologies: string[],
+  goal: string
+): Promise<{
+  sources: Array<{ title: string; url: string; description: string }>;
+  recommendations: string[];
+  reasoning: string;
+}> {
+  const status = await checkProviders();
+
+  // Prefer Gemini for web search (has grounding capability)
+  if (status.gemini) {
+    return await webSearchWithGemini(technologies, goal);
+  }
+
+  // Ollama fallback - no actual web search, just recommendations
+  if (status.ollama) {
+    try {
+      const ollama = await import('ollama');
+      const prompt = `Given these technologies: ${technologies.join(', ')}
+And this goal: ${goal}
+
+Suggest documentation sources to look up. Return JSON:
+{
+  "sources": [],
+  "recommendations": ["recommendation 1", "recommendation 2"],
+  "reasoning": "explanation"
+}`;
+
+      const response = await ollama.default.chat({
+        model: 'qwen2.5:1.5b',
+        messages: [{ role: 'user', content: prompt }],
+      });
+
+      const jsonMatch = response.message.content.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        return {
+          sources: [],
+          recommendations: parsed.recommendations || [],
+          reasoning: parsed.reasoning + ' (Ollama - no web access)',
+        };
+      }
+    } catch (err) {
+      logger.warn({ error: err }, 'Ollama web search fallback failed');
+    }
+  }
+
+  // No providers available
+  return {
+    sources: [],
+    recommendations: [
+      `Search for "${technologies.join(' ')} documentation" on Google`,
+      `Check npm/PyPI for official package docs`,
+      `Look for "awesome-${technologies[0]?.toLowerCase() || 'list'}" on GitHub`,
+    ],
+    reasoning: 'No LLM providers available for web search',
+  };
+}
+
 export default {
   checkProviders,
   scoreRelevance,
   research,
+  webSearch,
   getProviderStatus,
   clearProviderCache,
 };
