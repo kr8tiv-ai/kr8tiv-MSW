@@ -31,12 +31,19 @@ interface NotebookLibraryEntry {
   use_cases: string[];
 }
 
+interface DiscoveredSource {
+  title: string;
+  url: string;
+  description: string;
+}
+
 interface MswConfig {
   initialized: string;
   notebookUrl?: string;
   notebookUrls?: string[];
   discoveryComplete?: boolean;
   discoveredTopics?: string[];
+  discoveredSources?: DiscoveredSource[];
   version: string;
 }
 
@@ -326,17 +333,28 @@ export function registerMswDiscover(server: McpServer): void {
 
         // 7. Update config with discovery results
         const existingConfig = JSON.parse(fs.readFileSync(configPath, "utf-8")) as MswConfig;
+
+        // Collect all discovered sources with URLs
+        const allDiscoveredSources: DiscoveredSource[] = webResults.sources
+          .filter(s => s.url && s.url.startsWith('http'))
+          .map(s => ({
+            title: s.title,
+            url: s.url,
+            description: s.description,
+          }));
+
         const updatedConfig: MswConfig = {
           ...existingConfig,
           discoveryComplete: true,
           discoveredTopics: discovery.topics,
+          discoveredSources: allDiscoveredSources,
           notebookUrls: matchingNotebooks.length > 0
             ? [...new Set([...existingConfig.notebookUrls || [], ...matchingNotebooks.map(n => n.url)])]
             : existingConfig.notebookUrls,
         };
 
         fs.writeFileSync(configPath, JSON.stringify(updatedConfig, null, 2));
-        logger.info({ configPath }, "Config updated with discovery results");
+        logger.info({ configPath, sourceCount: allDiscoveredSources.length }, "Config updated with discovery results");
 
         // 8. Return comprehensive result
         const allSources = [
