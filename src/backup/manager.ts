@@ -15,6 +15,7 @@ import * as os from 'node:os';
 import { execSync } from 'node:child_process';
 
 export interface BackupMetadata {
+  id?: string;
   timestamp: string;
   reason: string;
   version: string;
@@ -44,8 +45,14 @@ export class BackupManager {
    */
   async createBackup(reason: string): Promise<string> {
     const timestamp = new Date().toISOString().replace(/[:.]/g, '-');
-    const backupId = `backup-${timestamp}`;
-    const backupPath = path.join(this.backupDir, backupId);
+    let backupId = `backup-${timestamp}`;
+    let backupPath = path.join(this.backupDir, backupId);
+    let suffix = 0;
+    while (fs.existsSync(backupPath)) {
+      suffix += 1;
+      backupId = `backup-${timestamp}-${suffix}`;
+      backupPath = path.join(this.backupDir, backupId);
+    }
 
     fs.mkdirSync(backupPath, { recursive: true });
 
@@ -78,6 +85,7 @@ export class BackupManager {
 
       // Create metadata
       const metadata: BackupMetadata = {
+        id: backupId,
         timestamp,
         reason,
         version: '1.0.0', // MSW version
@@ -210,6 +218,9 @@ export class BackupManager {
       if (fs.existsSync(metadataPath)) {
         try {
           const metadata = JSON.parse(fs.readFileSync(metadataPath, 'utf-8'));
+          if (!metadata.id) {
+            metadata.id = entry;
+          }
           backups.push(metadata);
         } catch {
           // Skip invalid metadata
@@ -261,7 +272,7 @@ export class BackupManager {
     // Delete oldest backups
     const toDelete = backups.slice(MAX_BACKUPS);
     for (const backup of toDelete) {
-      const backupId = `backup-${backup.timestamp}`;
+      const backupId = backup.id ?? `backup-${backup.timestamp}`;
       this.deleteBackup(backupId);
     }
   }
