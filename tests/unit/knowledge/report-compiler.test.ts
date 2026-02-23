@@ -278,14 +278,15 @@ describe("ReportCompiler snapshots", () => {
     const baseDir = "/home/user/projects/msw";
 
     const filePath = compiler.getFilePath(sessionId, baseDir);
+    const normalizedPath = filePath.replace(/\\/g, "/");
 
-    expect(filePath).toMatchSnapshot();
-    expect(filePath).toContain(sessionId);
+    expect(normalizedPath).toMatchSnapshot();
+    expect(normalizedPath).toContain(sessionId);
     // Path contains these components (OS-agnostic check)
-    expect(filePath).toContain(".msw");
-    expect(filePath).toContain("research");
-    expect(filePath).toContain("sessions");
-    expect(filePath.endsWith(".md")).toBe(true);
+    expect(normalizedPath).toContain(".msw");
+    expect(normalizedPath).toContain("research");
+    expect(normalizedPath).toContain("sessions");
+    expect(normalizedPath.endsWith(".md")).toBe(true);
   });
 
   it("compiles complex real-world report", () => {

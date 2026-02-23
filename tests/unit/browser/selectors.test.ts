@@ -1,9 +1,12 @@
 // vitest globals enabled - no import needed
 import { chromium, type Browser, type Page } from "playwright";
+import fs from "node:fs";
 import { startMockNotebookLM, type MockNotebookLMServer } from "../../helpers/mock-notebooklm.js";
 import { Selectors } from "../../../src/browser/selectors.js";
 
-describe("NotebookLM selectors", () => {
+const describeWithBrowser = fs.existsSync(chromium.executablePath()) ? describe : describe.skip;
+
+describeWithBrowser("NotebookLM selectors", () => {
   let browser: Browser;
   let page: Page;
   let mockServer: MockNotebookLMServer;
