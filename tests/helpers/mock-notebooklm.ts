@@ -18,6 +18,17 @@ export async function startMockNotebookLM(options?: {
 }): Promise<MockNotebookLMServer> {
   const app = express();
   const delay = options?.delayMs ?? 0;
+  const htmlCandidates = [
+    path.join(__dirname, "../mocks/notebooklm-ui.html"),
+    path.resolve(process.cwd(), "tests/mocks/notebooklm-ui.html"),
+  ];
+  const htmlPath = htmlCandidates.find((candidate) => fs.existsSync(candidate));
+  if (!htmlPath) {
+    throw new Error(
+      `Mock NotebookLM fixture not found. Tried: ${htmlCandidates.join(", ")}`,
+    );
+  }
+  const html = fs.readFileSync(htmlPath, "utf8");
 
   // Middleware to simulate network latency
   if (delay > 0) {
@@ -28,8 +39,7 @@ export async function startMockNotebookLM(options?: {
 
   // Serve mock UI HTML
   app.get("/notebook/:id", (req, res) => {
-    const htmlPath = path.join(__dirname, "../mocks/notebooklm-ui.html");
-    res.sendFile(htmlPath);
+    res.type("html").send(html);
   });
 
   // Optional: API endpoint for programmatic testing

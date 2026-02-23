@@ -241,9 +241,13 @@ export class HealthChecker {
   }
 
   private async checkAuth(): Promise<void> {
-    const profilePath = path.join(os.homedir(), '.msw', 'chrome_profile', '.authenticated');
+    const markerCandidates = [
+      path.join(os.homedir(), '.msw', 'chrome-profile', '.authenticated'),
+      path.join(os.homedir(), '.msw', 'chrome_profile', '.authenticated'),
+    ];
+    const profilePath = markerCandidates.find((p) => fs.existsSync(p));
 
-    if (!fs.existsSync(profilePath)) {
+    if (!profilePath) {
       this.checks.push({
         name: 'authentication',
         status: 'warn',

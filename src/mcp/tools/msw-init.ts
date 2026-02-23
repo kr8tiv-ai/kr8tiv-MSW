@@ -53,7 +53,8 @@ export function registerMswInit(server: McpServer): void {
           const authenticator = new Authenticator({
             profileDir: defaultProfileDir,
             headless: false, // Visible browser for manual login
-            timeout: 120000, // 2 minutes
+            timeout: 300000, // 5 minutes for first-time manual Google auth
+            maxRetries: 1,   // Avoid opening/closing browser repeatedly during manual flow
             validateAuth: true,
           });
 

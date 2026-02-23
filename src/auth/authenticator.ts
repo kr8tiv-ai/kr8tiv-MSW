@@ -13,6 +13,7 @@ import { BrowserDriver } from '../browser/driver.js';
 import { ProfileManager } from '../browser/profile.js';
 import { BackupManager } from '../backup/index.js';
 import { globalDegradation } from '../common/degradation.js';
+import { NotebookNavigator } from '../notebooklm/navigator.js';
 import * as fs from 'node:fs';
 import * as path from 'node:path';
 import * as os from 'node:os';
@@ -35,7 +36,7 @@ export interface AuthResult {
 }
 
 const NOTEBOOKLM_URL = 'https://notebooklm.google.com';
-const DEFAULT_PROFILE_DIR = path.join(os.homedir(), '.msw', 'chrome_profile');
+const DEFAULT_PROFILE_DIR = path.join(os.homedir(), '.msw', 'chrome-profile');
 const AUTH_TIMEOUT = 120000; // 2 minutes for manual login
 
 export class Authenticator {
@@ -249,21 +250,37 @@ export class Authenticator {
   private async waitForAuth(page: Page): Promise<void> {
     const timeout = this.config.timeout;
     const startTime = Date.now();
+    const navigator = new NotebookNavigator(page);
 
     while (Date.now() - startTime < timeout) {
-      // Check for NotebookLM authenticated UI
       const url = page.url();
+      const lowerUrl = url.toLowerCase();
 
-      // If we're on a notebook page or the main NotebookLM page (not login), we're authenticated
-      if (url.includes('notebooklm.google.com/notebook') ||
-          (url.includes('notebooklm.google.com') && !url.includes('/auth'))) {
+      if (
+        lowerUrl.includes('notebooklm.google.com') &&
+        !lowerUrl.includes('/auth') &&
+        !lowerUrl.includes('/signin')
+      ) {
+        const ready = await navigator.isReady();
+        if (ready) {
+          console.log('[auth] Detected NotebookLM authenticated workspace');
+          return;
+        }
 
-        // Additional check: look for NotebookLM UI elements
-        const notebookElement = await page.$('[data-testid="notebook"]').catch(() => null);
-        const createButton = await page.$('button:has-text("Create")').catch(() => null);
+        // Notebook home without notebook open is still authenticated.
+        const createButtonVisible = await page
+          .getByRole('button', { name: /create|new notebook|new/i })
+          .isVisible({ timeout: 500 })
+          .catch(() => false);
 
-        if (notebookElement || createButton) {
-          console.log('[auth] Detected NotebookLM authenticated state');
+        const hasNotebookLinks = await page
+          .locator('a[href*="/notebook/"]')
+          .first()
+          .isVisible({ timeout: 500 })
+          .catch(() => false);
+
+        if (createButtonVisible || hasNotebookLinks) {
+          console.log('[auth] Detected NotebookLM authenticated home');
           return;
         }
       }
@@ -280,27 +297,54 @@ export class Authenticator {
    */
   private async validateAuthentication(page: Page): Promise<boolean> {
     try {
-      // Check for Google auth cookies
-      const cookies = await page.context().cookies();
-      const hasGoogleAuth = cookies.some(c =>
-        c.domain.includes('google.com') &&
-        (c.name.includes('SID') || c.name.includes('SSID'))
-      );
-
-      if (!hasGoogleAuth) {
-        console.log('[auth] Missing Google auth cookies');
-        return false;
-      }
-
       // Check page URL is NotebookLM (not login page)
       const url = page.url();
-      if (url.includes('/auth') || url.includes('/login')) {
+      const lowerUrl = url.toLowerCase();
+      if (
+        lowerUrl.includes('accounts.google.com') ||
+        lowerUrl.includes('/auth') ||
+        lowerUrl.includes('/login') ||
+        lowerUrl.includes('/signin')
+      ) {
         console.log('[auth] Still on login page');
         return false;
       }
 
+      // Prefer UI-based validation over cookie-name assumptions.
+      const navigator = new NotebookNavigator(page);
+      const ready = await navigator.isReady();
+      if (ready) {
+        console.log('[auth] Notebook workspace is ready');
+        return true;
+      }
+
+      const createButtonVisible = await page
+        .getByRole('button', { name: /create|new notebook|new/i })
+        .isVisible({ timeout: 1000 })
+        .catch(() => false);
+      if (createButtonVisible) {
+        console.log('[auth] Notebook home is visible');
+        return true;
+      }
+
+      const notebookLinkVisible = await page
+        .locator('a[href*="/notebook/"]')
+        .first()
+        .isVisible({ timeout: 1000 })
+        .catch(() => false);
+      if (notebookLinkVisible) {
+        console.log('[auth] Existing notebook list detected');
+        return true;
+      }
+
+      // Last fallback: NotebookLM URL without auth redirect.
+      if (lowerUrl.includes('notebooklm.google.com')) {
+        console.log('[auth] NotebookLM URL detected without auth redirect');
+        return true;
+      }
+
       console.log('[auth] Authentication validated successfully');
-      return true;
+      return false;
 
     } catch (err) {
       console.error('[auth] Validation error:', err);
