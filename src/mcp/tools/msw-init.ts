@@ -25,15 +25,23 @@ export function registerMswInit(server: McpServer): void {
       try {
         const mswDir = path.join(projectDir, ".msw");
         const researchDir = path.join(mswDir, "research");
+        const defaultProfileDir = path.join(
+          process.env.HOME || process.env.USERPROFILE || "",
+          ".msw",
+          "chrome-profile",
+        );
 
         fs.mkdirSync(researchDir, { recursive: true });
 
         const config = {
           initialized: new Date().toISOString(),
-          notebookUrl: notebookUrls?.[0] ?? "",
           notebookUrls: notebookUrls ?? [],
+          profileDir: defaultProfileDir,
           version: "0.1.0",
         };
+        if (notebookUrls?.[0]) {
+          (config as { notebookUrl?: string }).notebookUrl = notebookUrls[0];
+        }
 
         const configPath = path.join(mswDir, "config.json");
         fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
@@ -43,9 +51,10 @@ export function registerMswInit(server: McpServer): void {
         if (!skipAuth) {
           console.log("[msw] Setting up Google authentication...");
           const authenticator = new Authenticator({
-            profileDir: path.join(mswDir, "chrome_profile"),
+            profileDir: defaultProfileDir,
             headless: false, // Visible browser for manual login
-            timeout: 120000, // 2 minutes
+            timeout: 300000, // 5 minutes for first-time manual Google auth
+            maxRetries: 1,   // Avoid opening/closing browser repeatedly during manual flow
             validateAuth: true,
           });
 

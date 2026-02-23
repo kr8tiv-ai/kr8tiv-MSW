@@ -110,7 +110,9 @@ $mcpEntry = [pscustomobject]@{
 }
 
 $mcpConfig.mcpServers | Add-Member -MemberType NoteProperty -Name "msw" -Value $mcpEntry -Force
-$mcpConfig | ConvertTo-Json -Depth 10 | Set-Content -Encoding UTF8 -Path $MCP_CONFIG
+$json = $mcpConfig | ConvertTo-Json -Depth 10
+$utf8NoBom = New-Object System.Text.UTF8Encoding($false)
+[System.IO.File]::WriteAllText($MCP_CONFIG, $json, $utf8NoBom)
 Write-Ok "MCP config updated at $MCP_CONFIG"
 
 # Step 6: Verify installation

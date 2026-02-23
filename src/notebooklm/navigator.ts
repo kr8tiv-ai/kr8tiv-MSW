@@ -3,7 +3,7 @@
  * the UI is ready for interaction.
  */
 
-import type { Page } from 'playwright';
+import type { Locator, Page } from 'playwright';
 import type { NotebookConnection } from '../types/browser.js';
 import { createLogger } from '../logging/index.js';
 import { QuotaTracker } from '../rate-limiting/index.js';
@@ -15,9 +15,83 @@ const metrics = getMetricsCollector();
 
 export class NotebookNavigator {
   private page: Page;
+  private static readonly READY_TIMEOUT_MS = 30000;
 
   constructor(page: Page) {
     this.page = page;
+  }
+
+  private isAuthUrl(url: string): boolean {
+    const l = (url || '').toLowerCase();
+    return (
+      l.includes('accounts.google.com') ||
+      l.includes('servicelogin') ||
+      l.includes('/signin') ||
+      l.includes('/challenge') ||
+      l.includes('/auth')
+    );
+  }
+
+  private getInputCandidates(): Locator[] {
+    return [
+      this.page.getByRole('textbox', { name: /ask|type|message|chat/i }).first(),
+      this.page.locator('textarea[aria-label*="ask" i]').first(),
+      this.page.locator('textarea[placeholder*="ask" i]').first(),
+      this.page.locator('textarea[placeholder*="message" i]').first(),
+      this.page.locator('textarea').first(),
+      this.page.locator('[contenteditable="true"][role="textbox"]').first(),
+      this.page.locator('[contenteditable="true"][aria-label*="ask" i]').first(),
+      this.page.locator('[contenteditable="true"]').first(),
+    ];
+  }
+
+  private getSendButtonCandidates(): Locator[] {
+    return [
+      this.page.getByRole('button', { name: /send|submit|ask/i }).first(),
+      this.page.locator('button[aria-label*="send" i]').first(),
+      this.page.locator('button:has-text("Send")').first(),
+    ];
+  }
+
+  private async findVisible(candidates: Locator[], timeout = 1000): Promise<Locator | null> {
+    for (const locator of candidates) {
+      const visible = await locator.isVisible({ timeout }).catch(() => false);
+      if (visible) {
+        return locator;
+      }
+    }
+    return null;
+  }
+
+  private async waitForReady(): Promise<Locator> {
+    const deadline = Date.now() + NotebookNavigator.READY_TIMEOUT_MS;
+    while (Date.now() < deadline) {
+      const url = this.page.url();
+      if (this.isAuthUrl(url)) {
+        throw new Error(
+          'NotebookLM requires authentication. Please run MSW once with a visible browser to log in manually, then restart.',
+        );
+      }
+
+      const explicitSignIn = await this.page
+        .getByRole('button', { name: /sign in/i })
+        .isVisible({ timeout: 500 })
+        .catch(() => false);
+      if (explicitSignIn) {
+        throw new Error(
+          'NotebookLM requires authentication. Please run MSW once with a visible browser to log in manually, then restart.',
+        );
+      }
+
+      const input = await this.findVisible(this.getInputCandidates(), 750);
+      if (input) {
+        return input;
+      }
+
+      await this.page.waitForTimeout(750);
+    }
+
+    throw new Error('NotebookLM chat input not found within timeout');
   }
 
   /**
@@ -28,24 +102,9 @@ export class NotebookNavigator {
     logger.info({ notebookUrl }, 'Navigating to notebook');
     await this.page.goto(notebookUrl, { waitUntil: 'domcontentloaded' });
 
-    // Check if sign-in is required
-    const needsAuth = await this.page
-      .getByRole('button', { name: /sign in/i })
-      .isVisible({ timeout: 5000 })
-      .catch(() => false);
-
-    if (needsAuth) {
-      logger.error('NotebookLM authentication required');
-      throw new Error(
-        'NotebookLM requires authentication. Please run MSW once with a visible browser to log in manually, then restart.',
-      );
-    }
-
     // Wait for chat input to appear, indicating readiness
     logger.debug('Waiting for chat input to become ready');
-    await this.page
-      .getByRole('textbox', { name: /ask|type/i })
-      .waitFor({ state: 'visible', timeout: 30000 });
+    await this.waitForReady();
 
     logger.info('Successfully connected to notebook');
     return { connected: true, url: notebookUrl };
@@ -55,10 +114,8 @@ export class NotebookNavigator {
    * Check whether the chat input textbox is currently visible.
    */
   async isReady(): Promise<boolean> {
-    return this.page
-      .getByRole('textbox', { name: /ask|type/i })
-      .isVisible()
-      .catch(() => false);
+    const input = await this.findVisible(this.getInputCandidates(), 500);
+    return Boolean(input);
   }
 
   /**
@@ -101,10 +158,25 @@ export class NotebookNavigator {
 
       logger.info({ query: query.substring(0, 100) }, 'Submitting query to NotebookLM');
 
-      // Submit the query
-      const inputBox = this.page.getByRole('textbox', { name: /ask|type/i });
-      await inputBox.fill(query);
-      await inputBox.press('Enter');
+      // Submit the query using the first visible input strategy.
+      const inputBox = await this.findVisible(this.getInputCandidates(), 1000);
+      if (!inputBox) {
+        throw new Error('Notebook input unavailable');
+      }
+
+      try {
+        await inputBox.fill(query);
+      } catch {
+        await inputBox.click();
+        await this.page.keyboard.type(query);
+      }
+
+      const sendButton = await this.findVisible(this.getSendButtonCandidates(), 500);
+      if (sendButton) {
+        await sendButton.click();
+      } else {
+        await inputBox.press('Enter');
+      }
 
       // Record successful query
       quotaTracker.recordRequest();

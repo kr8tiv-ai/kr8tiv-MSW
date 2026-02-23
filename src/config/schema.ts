@@ -4,7 +4,7 @@ import { z } from "zod";
  * Zod schema for MSW project configuration (.msw/config.json).
  */
 export const MswConfigSchema = z.object({
-  notebookUrl: z.string().url("notebookUrl must be a valid URL"),
+  notebookUrl: z.string().url("notebookUrl must be a valid URL").optional(),
   profileDir: z.string().optional(),
   relevanceThreshold: z
     .number()

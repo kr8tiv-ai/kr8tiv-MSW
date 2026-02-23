@@ -17,7 +17,7 @@ import type { Locator, Page } from 'playwright';
  */
 export const Selectors = {
   chatInput: (page: Page): Locator =>
-    page.getByRole('textbox', { name: /ask|type/i }),
+    page.getByRole('textbox', { name: /ask|type|message|chat/i }),
 
   sendButton: (page: Page): Locator =>
     page.getByRole('button', { name: /send|submit/i }),
@@ -29,7 +29,7 @@ export const Selectors = {
     page.locator('[data-message-author="assistant"]'),
 
   signInButton: (page: Page): Locator =>
-    page.getByRole('button', { name: /sign in/i }),
+    page.getByRole('button', { name: /sign in|log in|continue with google/i }),
 } as const;
 
 export type SelectorName = keyof typeof Selectors;
