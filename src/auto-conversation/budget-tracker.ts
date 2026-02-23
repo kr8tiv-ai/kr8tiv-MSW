@@ -96,7 +96,6 @@ export class BudgetTracker {
         queriesUsed: 0,
         limit: defaultLimit,
       };
-      this.filePath; // ensure assigned before persist
       return fresh;
     }
   }
