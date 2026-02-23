@@ -7,8 +7,29 @@ import { jobManager } from "../jobs/job-manager.js";
 import type { Job } from "../jobs/types.js";
 
 interface MswConfig {
-  notebookUrls?: string[];
+  notebookUrl?: string;
+  profileDir?: string;
+  notebookUrls?: Array<string | { url?: string }>;
   [key: string]: unknown;
+}
+
+function resolveNotebookUrl(config: MswConfig): string | undefined {
+  const first = config.notebookUrls?.[0];
+  if (typeof first === "string" && first.trim() !== "") {
+    return first;
+  }
+  if (
+    first &&
+    typeof first === "object" &&
+    typeof first.url === "string" &&
+    first.url.trim() !== ""
+  ) {
+    return first.url;
+  }
+  if (typeof config.notebookUrl === "string" && config.notebookUrl.trim() !== "") {
+    return config.notebookUrl;
+  }
+  return undefined;
 }
 
 /**
@@ -21,7 +42,7 @@ async function runResearchJob(
   projectDir: string,
   topic: string,
   notebookUrl: string | undefined,
-  options: { maxQueries: number; relevanceThreshold: number },
+  options: { maxQueries: number; relevanceThreshold: number; profileDir?: string },
 ): Promise<void> {
   jobManager.update(jobId, { status: "running" });
 
@@ -47,7 +68,9 @@ async function runResearchJob(
       return;
     }
 
-    const driver = new BrowserDriver();
+    const driver = new BrowserDriver({
+      ...(options.profileDir ? { profileDir: options.profileDir } : {}),
+    });
 
     try {
       // 1. Launch browser
@@ -234,12 +257,14 @@ export function registerMswResearch(server: McpServer): void {
 
       // Create job and return immediately
       const job: Job = jobManager.create("msw_research");
-      const notebookUrl = config.notebookUrls?.[0];
+      const notebookUrl = resolveNotebookUrl(config);
+      const profileDir = typeof config.profileDir === "string" ? config.profileDir : undefined;
 
       // Fire-and-forget the research job
       void runResearchJob(job.id, projectDir, topic, notebookUrl, {
         maxQueries,
         relevanceThreshold,
+        profileDir,
       });
 
       return {

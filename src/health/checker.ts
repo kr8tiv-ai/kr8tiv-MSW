@@ -26,6 +26,11 @@ export interface HealthReport {
 
 export class HealthChecker {
   private checks: HealthCheck[] = [];
+  private projectDir?: string;
+
+  constructor(projectDir?: string) {
+    this.projectDir = projectDir;
+  }
 
   async runAll(): Promise<HealthReport> {
     this.checks = [];
@@ -91,7 +96,9 @@ export class HealthChecker {
     }
 
     try {
-      const config = JSON.parse(fs.readFileSync(mcpConfigPath, 'utf-8'));
+      // Strip UTF-8 BOM when present (common on Windows-authored JSON files)
+      const raw = fs.readFileSync(mcpConfigPath, 'utf-8').replace(/^\uFEFF/, '');
+      const config = JSON.parse(raw);
 
       if (!config.mcpServers || !config.mcpServers.msw) {
         this.checks.push({
@@ -185,7 +192,7 @@ export class HealthChecker {
   }
 
   private async checkProjectConfig(): Promise<void> {
-    const configManager = new ConfigManager();
+    const configManager = new ConfigManager(this.projectDir);
 
     if (!configManager.configExists()) {
       this.checks.push({
@@ -297,9 +304,15 @@ export class HealthChecker {
         return;
       }
 
-      // Try to detect browser installation
-      const cacheDir = path.join(os.homedir(), '.cache', 'ms-playwright');
-      if (!fs.existsSync(cacheDir)) {
+      // Try to detect browser installation across platforms.
+      const cacheCandidates = [
+        path.join(os.homedir(), '.cache', 'ms-playwright'), // Linux/macOS default
+        process.env.LOCALAPPDATA ? path.join(process.env.LOCALAPPDATA, 'ms-playwright') : null, // Windows default
+        process.env.PLAYWRIGHT_BROWSERS_PATH ?? null, // Custom override
+      ].filter((p): p is string => Boolean(p));
+
+      const hasBrowserCache = cacheCandidates.some((dir) => fs.existsSync(dir));
+      if (!hasBrowserCache) {
         this.checks.push({
           name: 'playwright',
           status: 'warn',

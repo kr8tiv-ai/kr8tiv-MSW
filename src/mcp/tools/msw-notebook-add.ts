@@ -11,6 +11,7 @@ interface NotebookEntry {
 
 interface MswConfig {
   notebookUrls?: NotebookEntry[];
+  notebookUrl?: string;
   [key: string]: unknown;
 }
 
@@ -48,6 +49,9 @@ export function registerMswNotebookAdd(server: McpServer): void {
             entry.label = label;
           }
           config.notebookUrls.push(entry);
+          if (!config.notebookUrl) {
+            config.notebookUrl = notebookUrl;
+          }
           await writeFile(configPath, JSON.stringify(config, null, 2), "utf-8");
         }
 

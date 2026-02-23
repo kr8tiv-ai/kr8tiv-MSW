@@ -30,20 +30,20 @@ export async function runHealthCheck(
   options: HealthCheckOptions = {}
 ): Promise<HealthCheckResult> {
   const profilePath = options.profilePath || `${process.env.HOME || process.env.USERPROFILE}/.msw/chrome-profile`;
-  const configPath = options.configPath || `${process.cwd()}/.msw/config.yaml`;
+  const configPath = options.configPath || `${process.cwd()}/.msw/config.json`;
   const autoFix = options.autoFix ?? true;
 
   const checks: HealthCheck[] = [];
   const fixes: FixResult[] = [];
 
   // Check 1: Configuration exists
-  const configExists = existsSync(configPath);
+  const configExists = existsSync(configPath) || existsSync(`${process.cwd()}/.msw/config.yaml`);
   checks.push({
     name: "Configuration",
-    passed: configExists,
+    passed: true,
     message: configExists
       ? "Configuration file found"
-      : "No configuration file. Run `msw setup` first.",
+      : "No configuration file. Proceeding with defaults.",
   });
 
   // Check 2: Profile directory exists
@@ -88,7 +88,7 @@ export async function runHealthCheck(
 
   // Determine overall status
   const failedCritical = checks.some(
-    (c) => !c.passed && (c.name === "Configuration" || c.name === "Chrome Profile Lock")
+    (c) => !c.passed && c.name === "Chrome Profile Lock"
   );
 
   const status: HealthStatus = failedCritical

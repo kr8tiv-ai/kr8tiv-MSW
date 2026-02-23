@@ -29,7 +29,7 @@ export function registerMswStatus(server: McpServer): void {
         // Health check (msw doctor)
         if (runHealthCheck) {
           console.log("[msw] Running health check...");
-          const checker = new HealthChecker();
+          const checker = new HealthChecker(projectDir);
           const report = await checker.runAll();
 
           return {
