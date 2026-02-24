@@ -112,14 +112,14 @@ MSW creates an **Auto-Conversation Engine** that:
 
 **Windows (PowerShell)**:
 ```powershell
-git clone https://github.com/Matt-Aurora-Ventures/kr8tiv-MSW.git
+git clone https://github.com/kr8tiv-ai/kr8tiv-MSW.git
 cd kr8tiv-MSW
 .\setup.ps1
 ```
 
 **Linux/macOS (Bash)**:
 ```bash
-git clone https://github.com/Matt-Aurora-Ventures/kr8tiv-MSW.git
+git clone https://github.com/kr8tiv-ai/kr8tiv-MSW.git
 cd kr8tiv-MSW
 chmod +x setup.sh && ./setup.sh
 ```
@@ -143,14 +143,21 @@ See [SETUP.md](./SETUP.md) for detailed installation and authentication instruct
 | Tool | What It Does |
 |------|-------------|
 | `msw_init` | Initialize `.msw/` with **Google authentication** and config |
+| `msw_discover` | Run project discovery and gather relevant docs/notebooks before research |
 | `msw_status` | Check job progress, config, or run **health check** (`msw doctor`) |
-| `msw_notebook_add` | Link a NotebookLM notebook URL to the project |
-| `msw_research` | Auto-conversation engine — extract deep knowledge from NotebookLM |
+| `msw_notebook_add` | Link a NotebookLM notebook URL to the project (optional source auto-upload) |
+| `msw_upload_sources` | Upload discovered sources into a NotebookLM notebook |
+| `msw_research` | Auto-conversation engine — extract deep knowledge from NotebookLM (requires discovery first) |
 | `msw_plan` | Generate PRD grounded in research findings |
 | `msw_execute` | Run Ralph loop with NotebookLM feedback injection |
 | `msw_verify` | Validate implementation against requirements |
 
-**New**: `msw_init` now handles authentication automatically. Run `msw_status` with `runHealthCheck: true` for diagnostics.
+**Current flow**:
+1. Run `msw_init`
+2. Run `msw_discover`
+3. Optionally run `msw_notebook_add` / `msw_upload_sources`
+4. Run `msw_research`
+5. Continue with `msw_plan -> msw_execute -> msw_verify`
 
 ---
 
