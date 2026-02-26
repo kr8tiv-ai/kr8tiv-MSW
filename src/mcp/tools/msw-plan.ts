@@ -4,6 +4,7 @@ import { readdir, readFile, writeFile, mkdir, access } from "node:fs/promises";
 import { join, dirname } from "node:path";
 import { jobManager } from "../jobs/job-manager.js";
 import type { ToolResult } from "../jobs/types.js";
+import { resolvePathWithinBase } from "../../common/path-guard.js";
 
 export function registerMswPlan(server: McpServer): void {
   server.tool(
@@ -46,8 +47,16 @@ export function registerMswPlan(server: McpServer): void {
         }
       }
 
+      const requestedOutputPath = outputPath ?? join(mswDir, "PRD.md");
+      const prdPath = resolvePathWithinBase(projectDir, requestedOutputPath);
+      if (!prdPath) {
+        return {
+          content: [{ type: "text", text: "Error: outputPath must resolve inside the project directory" }],
+          isError: true,
+        };
+      }
+
       const job = jobManager.create("msw_plan");
-      const prdPath = outputPath ?? join(mswDir, "PRD.md");
 
       // Run in background
       void (async () => {
