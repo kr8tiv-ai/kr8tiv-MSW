@@ -61,7 +61,7 @@
     "playwright": "^1.58.1",
     "playwright-extra": "^4.3.6",
     "puppeteer-extra-plugin-stealth": "^2.11.2",
-    "simple-git": "^3.30.0",
+    "simple-git": "^3.32.3",
     "string-similarity": "^4.0.4",
     "zod": "^4.3.6"
   }
